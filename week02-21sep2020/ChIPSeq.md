@@ -7,9 +7,11 @@ For any protein of interest, ChIPSeq can be used to map global binding sites for
 
 #make the link(technology->application->statistics
 
-ChIPSeq->in vivo binding of protein of interest to the whole genome->hypothesis testing(p-value)
+ChIPSeq->in vivo binding of protein of interest to the whole genome->hypothesis testing (p-value)
 
-#contributers:
+#contributers as tuple (github username, name):
+
+(ymoon6, Youngbin Moon)
 
 
 #link to the resource:
