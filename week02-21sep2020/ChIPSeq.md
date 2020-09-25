@@ -12,7 +12,7 @@ ChIPSeq->discovery of new regulatory elements that interacts with protein of int
 
 ## contributers as tuple (github username, name):
 
-(ymoon6, Youngbin Moon)
+(ymoon06, Youngbin Moon)
 
 (speckerf, Felix Specker)
 
