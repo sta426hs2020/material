@@ -8,7 +8,7 @@ For any protein of interest, ChIPSeq can be used to map global binding sites for
 ##make the link(technology->application->statistics)
 
 
-ChIPSeq->discovery of new regulatory elements by that interacts with protein of interest->hypothesis testing (p-value)
+ChIPSeq->discovery of new regulatory elements that interacts with protein of interest->hypothesis testing (p-value)
 
 ##contributers as tuple (github username, name):
 
