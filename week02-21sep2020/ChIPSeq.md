@@ -12,7 +12,7 @@ ChIPSeq->in vivo binding of protein of interest to the whole genome->hypothesis 
 #contributers as tuple (github username, name):
 
 (ymoon6, Youngbin Moon)
-
+(speckerf, Felix Specker)
 
 #link to the resource:
 
