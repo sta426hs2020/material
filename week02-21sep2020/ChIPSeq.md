@@ -5,7 +5,7 @@
 ChIPSeq is a method used to identify the regions of DNA that binds to DNA-associated proteins.
 For any protein of interest, ChIPSeq can be used to map global binding sites for that protein.
 
-#make the link(technology->application->statistics
+#make the link(technology->application->statistics)
 
 ChIPSeq->in vivo binding of protein of interest to the whole genome->hypothesis testing (p-value)
 
