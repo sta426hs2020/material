@@ -15,7 +15,7 @@ ChIPSeq->discovery of new regulatory elements that interacts with protein of int
 (ymoon06, Youngbin Moon)
 
 (speckerf, Felix Specker)
-
+(gjaq, Garance Jaques)
 ## link to the resource:
 
 [link_to_resource](https://science.sciencemag.org/content/316/5830/1497?hwshib2=authn%3A1600986291%3A20200923%253Afa68459e-7542-4c13-93df-c33860c13fe5%3A0%3A0%3A0%3AmHdLlj0oHezGysPSsB%2FBGg%3D%3D)
