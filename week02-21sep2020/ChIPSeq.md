@@ -15,7 +15,7 @@ ChIPSeq->discovery of new regulatory elements that interacts with protein of int
 (ymoon06, Youngbin Moon)
 
 (speckerf, Felix Specker)
-KalvinDobler, Kalvin Dobler
+(KalvinDobler, Kalvin Dobler)
 (gjaq, Garance Jaques)
 ## link to the resource:
 [link_to_resource](https://www.illumina.com/techniques/sequencing/dna-sequencing/chip-seq.html)
