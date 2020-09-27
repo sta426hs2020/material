@@ -8,7 +8,7 @@ For any protein of interest, ChIPSeq can be used to map global binding sites for
 ## make the link(technology->application->statistics)
 
 
-ChIPSeq->discovery of new regulatory elements that interacts with protein of interest->hypothesis testing (p-value) from for example poisson distribution (use peak calling algorithm for this). 
+ChIPSeq->discovery of new regulatory elements that interacts with protein of interest->hypothesis testing (p-value) from for example poisson distribution (use peak calling algorithm for this) [1,2,3]. 
 
 ## contributers as tuple (github username, name):
 
@@ -21,7 +21,10 @@ ChIPSeq->discovery of new regulatory elements that interacts with protein of int
 (gjaq, Garance Jaques)
 
 (last contributor github ID, last contributor name)
+
 ## link to the resource:
-[link_to_resource1](https://www.illumina.com/techniques/sequencing/dna-sequencing/chip-seq.html)
-[link_to_resource2](https://science.sciencemag.org/content/316/5830/1497?hwshib2=authn%3A1600986291%3A20200923%253Afa68459e-7542-4c13-93df-c33860c13fe5%3A0%3A0%3A0%3AmHdLlj0oHezGysPSsB%2FBGg%3D%3D)
-[link_to_resource3](https://en.wikipedia.org/wiki/Peak_calling)
+[link_to_resource_1](https://www.illumina.com/techniques/sequencing/dna-sequencing/chip-seq.html)
+
+[link_to_resource_2](https://science.sciencemag.org/content/316/5830/1497?hwshib2=authn%3A1600986291%3A20200923%253Afa68459e-7542-4c13-93df-c33860c13fe5%3A0%3A0%3A0%3AmHdLlj0oHezGysPSsB%2FBGg%3D%3D)
+
+[link_to_resource_3](https://en.wikipedia.org/wiki/Peak_calling)
