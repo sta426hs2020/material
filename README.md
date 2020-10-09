@@ -32,7 +32,7 @@ Monday 11.00-11.45 (remote)
 | 02.11.2020  | Mark | edgeR+friends 2  | GLM/DEXSeq | | |
 | 09.11.2020  | Kathi | hands-on session #1: RNA-seq  | FASTQC/Salmon/etc. | (RA, HH) | X |
 | 16.11.2020  | Hubert | single-cell 1: preprocessing, dim. reduction, clustering | | [Testing hypotheses about the microbiome using the linear decomposition model](https://www.biorxiv.org/content/10.1101/229831v3.full.pdf+html) (FS,BO,SA) | [Generalizing RNA velocity to transient cell states through dynamical modeling](https://www.nature.com/articles/s41587-020-0591-3?proof=t) (DP, EH) |
-| 23.11.2020  | Helena | hands-on session #2: cytometry  | cytof null comparison | X | X |
+| 23.11.2020  | Helena | hands-on session #2: cytometry  | cytof null comparison | A test metric for assessing single-cell RNA-seq batch correction (https://www.nature.com/articles/s41592-018-0254-1) (Dimitri Schmid, Lola Kourouma, ) | X |
 | 30.11.2020  | Mark | single-cell 2: cell type definition, differential state  | scRNA exercise 2 | [A Bayesian mixture model for the analysis of allelic expression in single cells](https://doi.org/10.1038/s41467-019-13099-0) (Sneha-Sundar,SmaragdaDimitrakopoulou,marinapanteli) | X |
 | 07.12.2020  | Pierre-Luc | hands-on session #3: single-cell RNA-seq  | full scRNA-seq pipeline | X | X |
 | 14.12.2020  | Mark | loose ends: HMM, EM, robustness   | segmentation, peak finding | X | X |
