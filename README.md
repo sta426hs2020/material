@@ -45,5 +45,3 @@ Assuming you have git installed locally, you can check out the entire set of cou
 git clone https://github.com/sta426hs2020/material.git
 ```  
 Alternatively, for a ZIP file of the repository, you can click on the (green) 'Clone or download' (top right) and then click 'Download ZIP'.
-
-g
