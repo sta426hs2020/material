@@ -35,7 +35,7 @@ Monday 11.00-11.45 (remote)
 | 23.11.2020  | Helena | hands-on session #2: cytometry  | cytof null comparison | | X |
 | 30.11.2020  | Mark | single-cell 2: cell type definition, differential state  | scRNA exercise 2 | [A Bayesian mixture model for the analysis of allelic expression in single cells](https://doi.org/10.1038/s41467-019-13099-0) (Sneha-Sundar,SmaragdaDimitrakopoulou,marinapanteli) | X |
 | 07.12.2020  | Pierre-Luc | hands-on session #3: single-cell RNA-seq  | full scRNA-seq pipeline | X | X |
-| 14.12.2020  | Mark | loose ends: HMM, EM, robustness   | segmentation, peak finding | A test metric for assessing single-cell RNA-seq batch correction (https://www.nature.com/articles/s41592-018-0254-1) (Dimitri Schmid, Lola Kourouma,... ) | X |
+| 14.12.2020  | Mark | loose ends: HMM, EM, robustness   | segmentation, peak finding | A test metric for assessing single-cell RNA-seq batch correction (https://www.nature.com/articles/s41592-018-0254-1) (Dimitri Schmid, Lola Kourouma, Jonas Bucher) | X |
 
 
 ## Course material
