@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Unsupervised learning: Dimension reduction</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="STA426" />
+    <script src="libs/header-attrs-2.3/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="src/css/style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Unsupervised learning: Dimension reduction
+## PCA
+### STA426
+### 28/09/2020
+
+---
+
+
+
+
+# Embedding of the data
+
+* Given a dataset `\(D = {x_1, \cdots, x_n}\)`, ( `\(x_i \in \mathbb{R}^d\)` ) obtain **embedding**, or low dimensional representation `\(z_i, \cdots, z_n \in \mathbb{R}^k\)`. 
+
+Motivation:
+
+* Visualization
+* Regularization (model selection)
+* Unsupervised feature discovery (i.e., determine features from data!)
+* identify hidden pattern in a data set
+* etc.
+
+
+---
+# PCA Objective
+
+* We want `\(z_i w \approx x\)`, e.g. minimizing `\(||z_i w - x_i||_2^2\)`
+
+* Optimize over `\(w, z_1, \cdots, z_n\)` jointly:
+`$$(w^*, z^*) = argmin \Sigma_{i = 1}^n ||W z_i - x_i||_2^2$$`
+
+* `\(W \in \mathbb{R}^{d \times k}, z_1, \cdots, z_n \in \mathbb{R}^k\)`, `\(W\)` should be orthogonal and will be a low-rank matrix
+
+* Does it remind you of anything? Maybe something in the supervised setting?
+
+
+
+---
+# Construct PCA
+* PCA assumes that the directions with the largest variances are the most “important”.
+
+* In the figure below, the first PC axis is the first principal direction along which the samples show the largest variation.
+
+* The second PC axis is the second most important direction and it is orthogonal to the first PC axis.
+
+&lt;p&gt;
+  &lt;img height="250" src="src/img/q5.png" &gt;
+  &lt;img height="250" src="src/img/q6.png" &gt;
+&lt;/p&gt;
+
+
+---
+# PCA Step by Step 
+
+&lt;p&gt;
+  &lt;img height="250" src="src/img/q1.png" &gt;
+  &lt;img height="250" src="src/img/q2.png" &gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;img height="250" src="src/img/q3.png" &gt;
+  &lt;img height="250" src="src/img/q4.png" &gt;
+&lt;/p&gt;
+
+
+---
+# Benefits of PCA
+
+* Among all projections, it's the one which minimizes the reoncstruction loss (measured in Euclidean norm)
+
+* In other words in PCA, we cliam that the k-most important information about a matrix are in its k largest singular values 
+
+* More mathematical approach: In matrices of rank k, PCA matrix will have the lowest reconstruction loss (true for Frobenius norm, nuclear norm, Euclidean norm, etc.)
+
+
+
+---
+# How find the coefficients?
+
+The solution involves the eigenvalues and eigenvectors of the variance-covariance matrix `\(\Sigma\)`.
+
+We are going to let `\(\lambda_1\)` through `\(\lambda_p\)` denote the eigenvalues of the variance-covariance matrix `\(\Sigma\)`. These are ordered so that `\(\lambda_1\)` has the largest eigenvalue and `\(\lambda_p\)` is the smallest.
+`$$\lambda_1 \ge \lambda_2 \ge \dots \ge \lambda_p$$`
+We are also going to let the vectors `\(e_1\)` through `\(e_p\)`
+`$$e_1 , e_2 , \dots , e_p$$`
+denote the corresponding eigenvectors. It turns out that the elements for these eigenvectors will be the coefficients of our principal components.
+`$$\textbf{var}(Y_i) = \text{var}(e_{i1}X_1 + e_{i2}X_2 + \dots e_{ip}X_p) = \lambda_i\\
+\text{cov}(Y_i, Y_j) = 0$$`
+
+---
+# How find the coefficients?
+
+All of this is defined in terms of the population variance-covariance matrix `\(\Sigma\)` which is unknown. However, we may estimate `\(\Sigma\)` by the sample variance-covariance matrix which is given in the standard formula here:
+`$$\textbf{S} = \frac{1}{n-1} \sum_{i=1}^{n}(\mathbf{X}_i-\bar{\textbf{x}})(\mathbf{X}_i-\bar{\textbf{x}})'$$`
+Compute the eigenvalues `\(\hat{\lambda}_1, \hat{\lambda}_2, \dots, \hat{\lambda}_p\)` of the sample variance-covariance matrix `\(S\)`, and the corresponding eigenvectors `\(\hat{\mathbf{e}}_1, \hat{\mathbf{e}}_2, \dots, \hat{\mathbf{e}}_p\)`.
+`$$\begin{array}{lll} \hat{Y}_1 &amp; = &amp; \hat{e}_{11}X_1 + \hat{e}_{12}X_2 + \dots + \hat{e}_{1p}X_p \\ \hat{Y}_2 &amp; = &amp; \hat{e}_{21}X_1 + \hat{e}_{22}X_2 + \dots + \hat{e}_{2p}X_p \\&amp;&amp;\vdots\\ \hat{Y}_p &amp; = &amp; \hat{e}_{p1}X_1 + \hat{e}_{p2}X_2 + \dots + \hat{e}_{pp}X_p \\ \end{array}$$`
+
+---
+# PCA with R
+
+
+```r
+library(GGally)
+ggpairs(data = mtcars,columns = 1:4)
+```
+
+&lt;img src="PCA_files/figure-html/unnamed-chunk-1-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# PCA with R
+
+
+```r
+pca = prcomp(mtcars, center=T, scale.=T)
+str(pca)
+```
+
+```
+## List of 5
+##  $ sdev    : num [1:11] 2.571 1.628 0.792 0.519 0.473 ...
+##  $ rotation: num [1:11, 1:11] -0.363 0.374 0.368 0.33 -0.294 ...
+##   ..- attr(*, "dimnames")=List of 2
+##   .. ..$ : chr [1:11] "mpg" "cyl" "disp" "hp" ...
+##   .. ..$ : chr [1:11] "PC1" "PC2" "PC3" "PC4" ...
+##  $ center  : Named num [1:11] 20.09 6.19 230.72 146.69 3.6 ...
+##   ..- attr(*, "names")= chr [1:11] "mpg" "cyl" "disp" "hp" ...
+##  $ scale   : Named num [1:11] 6.027 1.786 123.939 68.563 0.535 ...
+##   ..- attr(*, "names")= chr [1:11] "mpg" "cyl" "disp" "hp" ...
+##  $ x       : num [1:32, 1:11] -0.647 -0.619 -2.736 -0.307 1.943 ...
+##   ..- attr(*, "dimnames")=List of 2
+##   .. ..$ : chr [1:32] "Mazda RX4" "Mazda RX4 Wag" "Datsun 710" "Hornet 4 Drive" ...
+##   .. ..$ : chr [1:11] "PC1" "PC2" "PC3" "PC4" ...
+##  - attr(*, "class")= chr "prcomp"
+```
+
+---
+# PCA with R
+
+**Eigen Values**
+
+
+```r
+round(pca$sdev^2, 2)
+```
+
+```
+##  [1] 6.61 2.65 0.63 0.27 0.22 0.21 0.14 0.12 0.08 0.05 0.02
+```
+
+**Extract PCs**
+
+
+```r
+pcs = data.frame(pca$x)
+str(pcs)
+```
+
+```
+## 'data.frame':	32 obs. of  11 variables:
+##  $ PC1 : num  -0.647 -0.619 -2.736 -0.307 1.943 ...
+##  $ PC2 : num  1.708 1.526 -0.144 -2.326 -0.743 ...
+##  $ PC3 : num  -0.592 -0.376 -0.237 -0.134 -1.117 ...
+##  $ PC4 : num  0.1137 0.1991 -0.2452 -0.5038 0.0745 ...
+##  $ PC5 : num  -0.946 -1.017 0.399 0.549 0.208 ...
+##  $ PC6 : num  -0.017 -0.2417 -0.3488 0.0193 0.1492 ...
+##  $ PC7 : num  -0.4265 -0.4162 -0.6088 -0.0404 0.3835 ...
+##  $ PC8 : num  -0.00963 -0.08452 0.58526 -0.04958 -0.1603 ...
+##  $ PC9 : num  0.1464 0.0745 -0.1312 0.2202 -0.0212 ...
+##  $ PC10: num  -0.0667 -0.1269 0.0457 -0.0604 -0.0598 ...
+##  $ PC11: num  0.1797 0.0886 -0.0946 0.1476 0.1464 ...
+```
+
+---
+# Percentage of variance explained by PCs
+
+
+```r
+eigv = round(pca$sdev^2/sum(pca$sdev^2)*100, 2)
+eigv = data.frame(c(1:11),eigv)
+names(eigv) = c('PCs','Variance')
+plot(eigv,type = "b",col = "darkblue",lwd = 2);grid()
+```
+
+&lt;img src="PCA_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# PCA Pareto Chart
+
+
+```r
+PCA = pca$sdev^2
+names(PCA) = paste0('PC', eigv$PCs)
+qcc::pareto.chart(PCA)
+```
+
+&lt;img src="PCA_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
+
+```
+##       
+## Pareto chart analysis for PCA
+##           Frequency    Cum.Freq.   Percentage Cum.Percent.
+##   PC1    6.60840025   6.60840025  60.07636593  60.07636593
+##   PC2    2.65046789   9.25886815  24.09516266  84.17152860
+##   PC3    0.62719727   9.88606542   5.70179338  89.87332197
+##   PC4    0.26959744  10.15566285   2.45088578  92.32420776
+##   PC5    0.22345110  10.37911396   2.03137367  94.35558143
+##   PC6    0.21159612  10.59071008   1.92360110  96.27918252
+##   PC7    0.13526199  10.72597207   1.22965443  97.50883696
+##   PC8    0.12290143  10.84887350   1.11728575  98.62612271
+##   PC9    0.07704665  10.92592015   0.70042414  99.32654685
+##   PC10   0.05203544  10.97795559   0.47304946  99.79959631
+##   PC11   0.02204441  11.00000000   0.20040369 100.00000000
+```
+
+---
+# The principal component loadings
+
+
+```r
+pca$rotation
+```
+
+```
+##             PC1         PC2         PC3          PC4         PC5         PC6
+## mpg  -0.3625305  0.01612440 -0.22574419 -0.022540255  0.10284468 -0.10879743
+## cyl   0.3739160  0.04374371 -0.17531118 -0.002591838  0.05848381  0.16855369
+## disp  0.3681852 -0.04932413 -0.06148414  0.256607885  0.39399530 -0.33616451
+## hp    0.3300569  0.24878402  0.14001476 -0.067676157  0.54004744  0.07143563
+## drat -0.2941514  0.27469408  0.16118879  0.854828743  0.07732727  0.24449705
+## wt    0.3461033 -0.14303825  0.34181851  0.245899314 -0.07502912 -0.46493964
+## qsec -0.2004563 -0.46337482  0.40316904  0.068076532 -0.16466591 -0.33048032
+## vs   -0.3065113 -0.23164699  0.42881517 -0.214848616  0.59953955  0.19401702
+## am   -0.2349429  0.42941765 -0.20576657 -0.030462908  0.08978128 -0.57081745
+## gear -0.2069162  0.46234863  0.28977993 -0.264690521  0.04832960 -0.24356284
+## carb  0.2140177  0.41357106  0.52854459 -0.126789179 -0.36131875  0.18352168
+##               PC7          PC8          PC9        PC10         PC11
+## mpg   0.367723810 -0.754091423  0.235701617  0.13928524 -0.124895628
+## cyl   0.057277736 -0.230824925  0.054035270 -0.84641949 -0.140695441
+## disp  0.214303077  0.001142134  0.198427848  0.04937979  0.660606481
+## hp   -0.001495989 -0.222358441 -0.575830072  0.24782351 -0.256492062
+## drat  0.021119857  0.032193501 -0.046901228 -0.10149369 -0.039530246
+## wt   -0.020668302 -0.008571929  0.359498251  0.09439426 -0.567448697
+## qsec  0.050010522 -0.231840021 -0.528377185 -0.27067295  0.181361780
+## vs   -0.265780836  0.025935128  0.358582624 -0.15903909  0.008414634
+## am   -0.587305101 -0.059746952 -0.047403982 -0.17778541  0.029823537
+## gear  0.605097617  0.336150240 -0.001735039 -0.21382515 -0.053507085
+## carb -0.174603192 -0.395629107  0.170640677  0.07225950  0.319594676
+```
+
+
+---
+# Classification using PC1 and PC2
+
+
+```r
+biplot(pca,cex=0.8)
+```
+
+&lt;img src="PCA_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# PCA Packages
+
+
+```r
+library(ggbiplot)
+iris.pca = prcomp(iris[,-5], scale. = TRUE)
+ggbiplot(iris.pca, obs.scale = 1, var.scale = 1,
+  groups = iris$Species, ellipse = TRUE, circle = TRUE) +
+  scale_color_discrete(name = '') +
+  theme(legend.direction = 'horizontal', legend.position = 'top')
+```
+
+&lt;img src="PCA_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# What can go wrong in PCA?
+
+
+* Is there a linear trend? 
+
+* Did we select the correct distance measure?
+
+* PCA can show a misleading linear pattern  in high-dimensions
+
+* What else?
+
+
+---
+# Swiss roll
+* Is there a linear trend?
+
+&lt;img src="./swissroll2.png" width="500px" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+--- 
+# Our coordinate system choice in PCA
+
+* How do you solve this problem?
+
+&lt;img src="./pca fault.png" width="650px" style="display: block; margin: auto;" /&gt;
+
+* Try to regenerate this dataset and look into the principal components
+* Try to fix the problem
+
+
+---
+# PCA in high-dimensions
+
+* Is the data really having a low-dimensional structure? Does PCA see it? 
+
+* Can PCA trick us to see "something" which is not true?
+
+* Marchenko–Pastur distribution, or Marchenko–Pastur law, describes the asymptotic behavior of singular values of large rectangular random matrices.
+
+
+---
+# Thank You for Attention
+References: 
+* Introduction to Machine Learning Lecture 2020, ETH, Prof. Andreas Krause
+* MIT 18.065 Matrix Methods in Data Analysis, Signal Processing, and Machine Learning, Spring 2018, Prof. Gilbert strang
+* Marchenko–Pastur distribution Wiki page, accessed on 27th of September 2020
+* [Datacamp](https://www.datacamp.com/community/tutorials/pca-analysis-r)
+&lt;div style="text-align: center"&gt;
+  &lt;img height="400"  src="src/img/Data.gif" style="background:none; border:none; box-shadow:none;"&gt;
+&lt;/div&gt;
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

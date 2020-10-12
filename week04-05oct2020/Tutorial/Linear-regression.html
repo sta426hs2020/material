@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Linear models</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="STA426" />
+    <script src="libs/header-attrs-2.3/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="src/css/style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Linear models
+## Where and how?
+### STA426
+### 05.10.2020
+
+---
+
+# What is regression?
+
+
+
+Suppose we have `\((X,Y)\)` where `\(X \in \mathbb{R}^{n\times p}\)` denotes our explanatory variable and `\(Y \in \mathbb{R}^{p}\)` is our response variable or dependent variable. 
+
+Our interest lies in determining the function `\(m(x)\)`:
+`$$m(x) = \mathbb{E}[Y | X = x]$$`
+* What is `\(m(x)\)` in a simple linear regression case?
+
+
+---
+--- 
+# Simple linear regression
+* Linear regression model:
+
+$$ Y_i = x_i^T \beta + \epsilon_i $$
+
+* We don't observe `\(\epsilon_i\)`. But we assume that `\(\mathbb{E}[\epsilon_i] = 0\)`.
+
+* We assume that sample size is larger than the number of predictors `\((n &gt; p)\)`, i.e. `\(X\)` has full rank. What does it bring to us intuitively?
+
+* What is random in this model?
+
+
+---
+# Our goals from linear regression analysis
+
+* A good fit: Having small errors with the method of least squares
+
+* Good parameter estimates: Describing the change of the response variable when varying some predictor
+
+* Good prediction: For predicting a new reposnse
+
+* Uncertainteies and significance for the three goals above: Confidence intervals and statistical test are used for this goal
+
+
+---
+--- 
+# Least squares method
+The least square estimator `\(\hat{\beta}\)` is defined as:
+
+$$\hat{\beta} = argmin_{\beta} || Y - X \beta||^2 $$
+
+* Where we have to solve the normal equations in order to get `\(\beta\)`:
+$$ X^TX\hat{\beta} = X^T Y$$
+
+
+* If `\(X\)` is full rank, then `\(X^TX\)` is invertible and least squares estimator is **unique**. 
+
+* Residuals: `\(r_i = Y_i - x_i^T \hat{\beta}\)`
+
+---
+# Assumptions of the linear model
+
+In order that fitting a linear model by least squares is reasonable, and the tests and confidence intervals are approximately valid, we should have that: 
+
+* `\(X\)` has full rank `\((p&lt;n)\)`
+
+* All `\(x_i\)`s are exact
+
+* The variance of the errors is constant ("homoscedasticity"):
+$$ var(\epsilon_i) = \sigma^2$$
+for all `\(i\)`. 
+
+* The errors are uncorrelated:
+$$ Cov(\epsilon_i, \epsilon_j) = 0 $$
+For all `\(i\neq j\)`.
+
+* The errors are jointly normally distributed. As a results, the response variables are also jointly normally distributed
+
+
+---
+# Violations of the assumptions
+
+* What do we do if the variance of the errors are not constant? 
+
+
+---
+# Violations of the assumptions
+
+* What do we do if the variance of the errors are not constant? 
+
+`\(\longrightarrow\)` weight the errors differently, namely, use weighted least squares
+
+---
+# Violations of the assumptions
+
+* What do we do if the variance of the errors are not constant? 
+
+`\(\longrightarrow\)` weight the errors differently, namely, use weighted least squares
+
+* What if the errors are correlated?
+
+
+---
+# Violations of the assumptions
+
+* What do we do if the variance of the errors are not constant? 
+
+`\(\longrightarrow\)` weight the errors differently, namely, use weighted least squares
+
+* What if the errors are correlated?
+
+Include their correlation in the solution (Mahalanobis distance):
+
+$$ \hat{\beta} = argmin_{\beta} (Y - X\beta)^T \Omega^{-1} (y - X \beta)$$
+So called "Generalized least squares (GLS)".
+
+---
+# Violations of the assumption
+
+* What if the first assumption fails?
+
+
+
+
+---
+# Violations of the assumption
+
+* What if the first assumption fails?
+
+`\(\longrightarrow\)` You should consider other models than the linear model!
+
+
+
+---
+# Diagnostic plots for a regression model
+
+
+```r
+income = read.csv("./INCOME-SAVINGS.csv")
+linearmodel = lm(SAVINGS ~ INCOME , data = income)
+```
+
+* Can we use lm for a polynomial regression?
+
+
+---
+# Formulae in R
+
+&lt;img src="./Formulas in R.jpg" width="650px" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Diagnostic plots for a regression model
+
+&lt;img src="Linear-regression_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+# Analysis of residuals
+
+So called Tukey-Anscombe plot:
+
+Plot the residuals `\(r_i = Y_i - \hat{Y}_i\)` versus the fitted values `\(\hat{Y}_i\)`
+
+* How does it look like in the ideal case?
+
+
+---
+# Analysis of residuals
+
+So called Tukey-Anscombe plot:
+
+Plot the residuals `\(r_i = Y_i - \hat{Y}_i\)` versus the fitted values `\(\hat{Y}_i\)`
+
+* How does it look like in the ideal case?
+
+In the ideal case, it would fluctuate randomly around the horizolntal line through zero
+
+
+&lt;img src="./Ideal Tukey-Anscombe.png" width="650px" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Analysis of residuals
+
+* What can happen in a non-ideal case?
+
+---
+# Analysis of residuals
+
+* What can happen in a non-ideal case?
+
+&lt;img src="./Failure of Tukey-Anscombe.png" width="650px" style="display: block; margin: auto;" /&gt;
+
+* The expectation is not zero which indicates a systematic error. The linear model assumption is not correct!
+
+
+---
+--- 
+# Analysis of residuals
+
+* What can do in such cases? 
+
+* In case b?
+
+&lt;img src="./Failure of Tukey-Anscombe.png" width="650px" style="display: block; margin: auto;" /&gt;
+
+---
+--- 
+# Analysis of residuals
+
+* What can do in such cases? 
+
+* In case b?
+The square root  transform `\(Y \rightarrow \sqrt{Y}\)` stabilizes the variance. 
+
+* In case a?
+The log-transform `\(Y \rightarrow \log{Y}\)` stabilizes the variance. 
+
+* In case c, two groups with different variances
+
+* In case d, we're missing quadratic terms in the model
+
+
+
+---
+# Analysis of residuals
+
+* What about our case? 
+
+
+```r
+plot(linearmodel,1)
+```
+
+&lt;img src="Linear-regression_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Analysis of residuals - example
+* What about our case? 
+
+* residuals have a curved pattern
+
+* What does it mean?
+
+
+---
+# Analysis of residuals - example
+* What about our case? 
+
+
+* residuals have a curved pattern
+
+* What does it mean?
+
+* **may** get a better model is we try a  model with a quadratic term included
+
+
+---
+# Including the quadratic term
+
+
+```r
+fit.1 &lt;- lm(SAVINGS ~ INCOME + I(INCOME^2) , data = income)
+plot(fit.1, 1)
+```
+
+&lt;img src="Linear-regression_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+
+* What do we loose by including the quadratic term?
+
+
+---
+--- 
+# Normality check
+
+* Use a QQ-plot. But what is a QQ-plot? 
+
+
+
+---
+--- 
+# Normality check
+
+* Use a QQ-plot. But what is a QQ-plot? 
+
+Plot the empirical quantiles of the residuals (on the y-axis) versus the theoretical quantiles of a `\(\mathcal{N}(0, I)\)`.
+
+* What if our empirical quantile is a `\(\mathcal{N}(\mu, ,\sigma^2)\)`? 
+
+
+
+
+---
+--- 
+# Normality check
+
+* Use a QQ-plot. But what is a QQ-plot? 
+
+Plot the empirical quantiles of the residuals (on the y-axis) versus the theoretical quantiles of a `\(\mathcal{N}(0, I)\)`.
+
+* What if our empirical quantile is a `\(\mathcal{N}(\mu, ,\sigma^2)\)`? 
+
+The normal plot (QQ-plot) shows a approximate straight line with intercept `\(\mu\)` and slope `\(\sigma\)`. 
+
+
+
+
+---
+# Normality check
+
+
+&lt;img src="./normal QQplot.png" width="650px" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Normality check
+
+* What if the residuals don't have a normal distribution?
+
+&lt;img src="./not normal qqplot.png" width="650px" style="display: block; margin: auto;" /&gt;
+
+* A long tailed distribution in a
+
+* A skewed distribution in b
+
+* A dataset with outlier
+
+
+
+---
+# Normality check
+* What about our case? 
+
+```r
+plot(linearmodel, 2)
+```
+
+&lt;img src="Linear-regression_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+
+---
+# Scale location plot
+
+
+```r
+plot(linearmodel, 3)
+```
+
+&lt;img src="Linear-regression_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
+
+
+* A straight line before 100000, and then it goes up
+
+---
+# Scale location plot
+
+* Inquires homoscedasticity in our linear regression model
+
+* Variance should be reasonably equal across the predictor range.
+
+* Scale location plot indicates  spread of points across predicted values range
+
+* A horizontal red line is ideal and would indicate that residuals have uniform variance across the range.
+
+* As residuals spread wider from each other the red spread line goes up.
+
+
+
+
+---
+# Residuals vs leverage plot
+
+* What is influence and leverage?
+
+* The influence of an observation can be thought of in terms of how much the predicted scores would change  if the observation is excluded.
+
+* Cook’s Distance is a pretty good measure of influence of an observation.
+ 
+* The leverage of an observation is based on how much the observation’s value on the predictor variable differs from the mean of the predictor variable.
+
+* The more the leverage of an observation , the greater potential that point has in terms of influence.
+
+
+---
+# Residual vs Leverage plot - example
+
+
+```r
+plot(linearmodel, 5)
+```
+
+&lt;img src="Linear-regression_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Topics to look for the next week
+
+* R2 analysis in linear regression
+
+* Hypothesis tests
+
+* F-test
+
+* ANOVA
+
+
+&lt;!-- ---  --&gt;
+&lt;!-- # R2 --&gt;
+
+&lt;!-- --- --&gt;
+&lt;!-- # R2 and the goodness of fit --&gt;
+
+&lt;!-- * Does R2 measure the goodness of fit? --&gt;
+
+
+&lt;!-- --- --&gt;
+&lt;!-- # R2 and the goodness of fit --&gt;
+
+&lt;!-- * Does R2 measure the goodness of fit? --&gt;
+
+&lt;!-- * No! It can be arbitrarily low then the model is completely correct! --&gt;
+
+&lt;!-- --- --&gt;
+&lt;!-- # House Prices --&gt;
+
+&lt;!-- ```{r} --&gt;
+&lt;!-- dic_var = read_delim("../data/dictionnaire_variables.csv",delim = ";")  --&gt;
+&lt;!-- dic_nvx = read_csv("../data/dictionnaire_niveaux.csv", --&gt;
+&lt;!--                    col_names = c("variable", "label", "Type")) %&gt;%  --&gt;
+&lt;!--   select(1:3)  --&gt;
+&lt;!-- house = read_csv("../data/train.csv") --&gt;
+&lt;!-- house[1:6,1:10] --&gt;
+&lt;!-- ``` --&gt;
+
+&lt;!-- --- --&gt;
+&lt;!-- # Sales price --&gt;
+
+&lt;!-- ```{r} --&gt;
+&lt;!-- hchart(house$SalePrice, name = "price") %&gt;% hc_add_theme(hc_theme_ffx()) --&gt;
+&lt;!-- ``` --&gt;
+
+&lt;!-- --- --&gt;
+&lt;!-- # Zoning classification --&gt;
+
+&lt;!-- ```{r} --&gt;
+&lt;!-- house %&gt;% group_by(MSZoning) %&gt;% --&gt;
+&lt;!--   summarise(Average = mean(SalePrice) %&gt;% round()) -&gt; stat  --&gt;
+&lt;!-- hchart(stat,"column",hcaes(x = MSZoning, y = Average),name = "Average") --&gt;
+&lt;!-- ``` --&gt;
+
+&lt;!-- --- --&gt;
+&lt;!-- # Zoning classification --&gt;
+
+&lt;!-- ```{r} --&gt;
+&lt;!-- merge(stat,dic_nvx,by.x = "MSZoning",by.y = "label") %&gt;%  --&gt;
+&lt;!--   hchart("column",hcaes(x = Type, y = Average),name = "Average") %&gt;%  --&gt;
+&lt;!--   hc_add_theme(hc_theme_ffx()) --&gt;
+&lt;!-- ``` --&gt;
+
+&lt;!-- --- --&gt;
+&lt;!-- # Regression Models --&gt;
+
+&lt;!-- &lt;div style="text-align: center"&gt; --&gt;
+&lt;!-- &lt;img height="500" src="src/img/gm_regression.jpg" style="background:none; border:none; box-shadow:none;"&gt; --&gt;
+&lt;!-- &lt;/div&gt; --&gt;
+
+&lt;!-- --- --&gt;
+&lt;!-- # Regression models --&gt;
+
+&lt;!-- Regression models involve the following variables: --&gt;
+
+&lt;!-- * The unknown parameters, denoted as `\(\beta\)`, which may represent a scalar or a vector. --&gt;
+
+&lt;!-- * The independent variables, `\(X\)`. --&gt;
+
+&lt;!-- * The dependent variable, `\(Y\)`. --&gt;
+
+&lt;!-- In various fields of application, different terminologies are used in place of dependent and independent variables. --&gt;
+&lt;!-- A regression model relates `\(Y\)` to a function of `\(X\)` and `\(\beta\)`. --&gt;
+
+&lt;!-- `$$Y \approx f (\mathbf {X}, \beta )$$` --&gt;
+
+&lt;!-- The approximation is usually formalized as `\(E(Y | X) = f(X, \beta)\)`. --&gt;
+
+&lt;!-- --- --&gt;
+&lt;!-- # The Multivariatelinear regression --&gt;
+
+&lt;!-- $$Y_i =  \beta_1 X_{1i} + \beta_2 X_{2i} + \ldots + --&gt;
+&lt;!-- \beta_{p} X_{pi} + \epsilon_{i}\\ --&gt;
+&lt;!-- = \sum_{k=1}^p X_{ik} \beta_j + \epsilon_{i}$$ --&gt;
+&lt;!-- for `\(i = 1, ..., N\)`. Here `\(X_{1i}=1\)` typically, so that an intercept is included. --&gt;
+
+&lt;!-- Assume now that the vector of unknown parameters `\(\beta\)` is of length k.  --&gt;
+
+&lt;!-- * If N data points of the form `\((Y, X)\)` are observed, where `\(N &lt; k\)`, system of equations defining the regression model is underdetermined, there are not enough data to recover β. --&gt;
+
+&lt;!-- * The most common situation is where `\(N \geq k\)` data points are observed. In this case, there is enough information in the data to estimate a unique value for β that best fits the data in some sense, and the regression model when applied to the data can be viewed as an overdetermined system in `\(\beta\)`. --&gt;
+
+&lt;!-- --- --&gt;
+&lt;!-- # The Multivariatelinear regression --&gt;
+
+&lt;!-- Classical assumptions for regression analysis include: --&gt;
+
+&lt;!-- * The sample is representative of the population for the inference prediction. --&gt;
+
+&lt;!-- * The error is a random variable with a mean of zero conditional on the explanatory variables. --&gt;
+
+&lt;!-- * The independent variables are measured with no error.  --&gt;
+
+&lt;!-- * The independent variables (predictors) are linearly independent, i.e. it is not possible to express any predictor as a linear combination of the others. --&gt;
+
+&lt;!-- * The errors are uncorrelated, that is, the variance–covariance matrix of the errors is diagonal and each non-zero element is the variance of the error. --&gt;
+
+&lt;!-- * The variance of the error is constant across observations (homoscedasticity). --&gt;
+
+&lt;!-- --- --&gt;
+&lt;!-- # Galton Data --&gt;
+
+&lt;!-- For example, in simple linear regression for modeling  n  data points there is one independent variable:  `\(x_i\)` , and two parameters, `\(\beta_0\)` and `\(\beta_1\)`: --&gt;
+&lt;!-- straight line: `\(y_i=\beta_0 +\beta_1 x_i +\varepsilon_i,\quad i=1,\dots,n.\!\)`  --&gt;
+
+&lt;!-- Let `\(y_i\)` be the `\(i^{th}\)` kids’s height and `\(x_i\)` be the parents’ heights.  --&gt;
+
+&lt;!-- &lt;div align="center"&gt; --&gt;
+&lt;!-- &lt;img  height="300" src="src/img/parents-and-children.png"  align = 'center'  style="background:none; border:none; box-shadow:none;"&gt; --&gt;
+&lt;!-- &lt;/div&gt; --&gt;
+
+&lt;!-- --- --&gt;
+&lt;!-- # Galton Data --&gt;
+
+
+&lt;!-- ```{r} --&gt;
+&lt;!-- ggplot(Galton, aes(x = parent, y = child)) + geom_point()+ --&gt;
+&lt;!--   geom_smooth(method="lm", formula=y~x, colour = "blue") --&gt;
+&lt;!-- ``` --&gt;
+
+&lt;!-- --- --&gt;
+&lt;!-- # Regression model --&gt;
+
+&lt;!-- Using the least squares to estimate parameters : --&gt;
+
+&lt;!-- $$\sum_{i=1}^n \{y_i - (\beta_0 + \beta_1 x_i)\}^2\\ --&gt;
+&lt;!-- Y = \hat \beta_0 + \hat \beta_1 X\\ --&gt;
+&lt;!-- \hat \beta_1 =\frac{\sum(x_i-\bar{x})(y_i-\bar{y})}{\sum(x_i-\bar{x})^2} = \\ --&gt;
+&lt;!-- Cor(y, x) \frac{Sd(y)}{Sd(x)} ~~~ \hat \beta_0 = \bar y - \hat \beta_1 \bar x$$ --&gt;
+
+&lt;!-- The slope is the same one you would get if you centered the data, `\((x_i - \bar x, y_i - \bar y)\)` , and did regression through the origin. --&gt;
+
+&lt;!-- If you normalized the data, `\(\{ \frac{x_i - \bar x}{Sd(x)}, \frac{y_i - \bar y}{Sd(y)}\}\)` , the slope is `\(Cor(y, x)\)` --&gt;
+
+
+---
+# Thank You for Attention
+References: 
+* Chapter 1, Computational statistics script, Peter Bühlmann and Martin Mächler, Seminar for statistics, October 12, 2016
+* Lecture 10, 36-401 Modern Regression, Section B, Cosma Shalizi, Carnegie Mellon University, Fall 2015
+
+&lt;div style="text-align: center"&gt;
+  &lt;img width="400" height="400" src="src/img/Data.gif" style="background:none; border:none; box-shadow:none;"&gt;
+&lt;/div&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
