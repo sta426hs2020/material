@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
@@ -270,7 +269,6 @@ code {
 }
 img {
   max-width:100%;
-  height: auto;
 }
 .tabbed-pane {
   padding-top: 12px;
@@ -332,6 +330,7 @@ summary {
   border: none;
   display: inline-block;
   border-radius: 4px;
+  background-color: transparent;
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li {
@@ -365,7 +364,7 @@ summary {
 
 <h1 class="title toc-ignore">Exercise 6</h1>
 <h4 class="author">Hubert Rehrauer</h4>
-<h4 class="date">21 10 2019</h4>
+<h4 class="date">19 10 2020</h4>
 
 </div>
 
@@ -373,7 +372,7 @@ summary {
 <div id="comparison-of-expression-estimates" class="section level2">
 <h2>Comparison of Expression Estimates</h2>
 <p>The data set consists for 3 Normal samples and 3 Treated samples with 2.5 Mio reads each. The reads are simulated to come from genes on the human chromosome 1.</p>
-<p>The expression values from featureCounts were created with: We use the library subread to generate the counts</p>
+<p>The expression values from featureCounts were created with: We use the library <code>Rsubread</code> to generate the counts</p>
 <pre class="r"><code>library(Rsubread)
 countResult1 = featureCounts(..., strandSpecific=0,
                                  GTF.featureType=&quot;exon&quot;, GTF.attrType=&quot;gene_id&quot;, useMetaFeatures=TRUE,
