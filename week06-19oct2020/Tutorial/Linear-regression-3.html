@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Linear models</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="STA426" />
+    <script src="libs/header-attrs-2.3/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="src/css/style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Linear models
+## R-squared and model selection
+### STA426
+### 19.10.2020
+
+---
+
+# Coefficient of determination
+
+* Explaining the proportion of the total variation of `\(Y\)` around `\(\bar{Y}\)` which is explained by the regression 
+
+
+`$$R^2 = \frac{|| \hat{Y} - \bar{Y}||^2}{||Y - \bar{Y}||^2}$$`
+
+* Varies between 1 (the best) and 0 (the worst). 
+
+
+---
+# `\(R^2\)` limitations
+
+* Does not indicate if a regression model provides an adequate fit to your data
+
+* i.e. a good model can have low `\(R^2\)` 
+
+* A biased model can have high `\(R^2\)`
+
+* How to increase `\(R^2\)`?
+
+
+---
+# `\(R^2\)` limitations
+
+* Does not indicate if a regression model provides an adequate fit to your data
+
+* i.e. a good model can have low `\(R^2\)` 
+
+* A biased model can have high `\(R^2\)`
+
+* How to increase `\(R^2\)`?
+
+* Add more independent variables!
+
+
+---
+# `\(R^2\)` limitations
+
+&lt;img src="flplinear.gif" width="45%" height="18%" style="display: block; margin: auto;" /&gt;&lt;img src="reslinear.gif" width="45%" height="18%" style="display: block; margin: auto;" /&gt;
+
+
+* Pictures taken from [here](https://statisticsbyjim.com/regression/interpret-r-squared-regression)
+
+
+
+
+---
+# Are low `\(R^2\)` scores always a problem?
+
+
+* No! Some data have inherently greater amount of unexplainable variation.
+
+* For example a data about human behaviour
+
+* If you have a low `\(R^2\)`, can you draw conclusion about the relationship between the variables?
+
+
+
+
+---
+# Are low `\(R^2\)` scores always a problem?
+
+
+* No! Some data have inherently greater amount of unexplainable variation.
+
+* For example a data about human behaviour
+
+* If you have a low `\(R^2\)`, can you draw conclusion about the relationship between the variables?
+
+* Yes! if your independent variables are statistically significant.
+
+
+
+---
+# Model selection
+
+* Which predictor variable should be used in the linear model?
+
+
+
+
+
+
+
+---
+# Model selection
+
+* Which predictor variable should be used in the linear model?
+
+* Every coefficient is afflicted with variability
+
+* Variability of the estimated hyper-plabe increases with more predictors, relevant or not!
+
+* Aim: the optimal model
+
+
+
+---
+# Bias-variance tradeoff
+
+* Suppose we're looking to optimize the prediction with `\(q\)` out of `\(p\)` predictor variables:
+
+`$$\Sigma_{r = 1}^q \hat{\beta}_{j_r} x_{{ij}_r}$$`
+
+* The average MSE of this predictor is:
+`$$n^{-1}\Sigma_{i=1}^n \mathbb{E}[(m(x_i) - \Sigma_{r = 1}^q \hat{\beta}_{j_r} x_{{ij}_r})^2]$$`
+`$$= n^{-1} \Sigma_{i=1}^n (\mathbb{E}[\Sigma_{r = 1}^q \hat{\beta}_{j_r} x_{{ij}_r}] - m(x_i))^2 
+n^{-1}\Sigma_{i=1}^n Var(\Sigma_{r = 1}^q \hat{\beta}_{j_r} x_{{ij}_r})$$`
+
+* `\(m(.)\)` denotes the regression function in the full model
+
+* The first term is the bias squared
+
+
+
+---
+# Bias-variance tradeoff
+
+* How does bias change with adding a predictor?
+
+
+
+
+
+
+
+
+---
+# Bias-variance tradeoff
+
+* How does bias change with adding a predictor?
+
+* How does the variance change with adding a predictor?
+
+
+---
+# Bias-variance tradeoff
+
+* How does bias change with adding a predictor?
+
+* How does the variance change with adding a predictor?
+
+* Note that the variance term is equal to `\(\frac{q}{n} \sigma^2\)`
+
+* Finding the best model means to optimize the bias-variance tradeoff. This problem is reffered to regularization
+
+
+---
+# Bias-variance tradeoff
+
+&lt;img src="./Model complexity vs fit.png" width="650px" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Mallows `\(C_p\)` statistic
+
+* MSE is unknown
+
+* We don't know the magnitude of the bias term
+
+* We can still estimate it! What can help us estimating MSE?
+
+
+
+---
+# Mallows `\(C_p\)` statistic
+
+* MSE is unknown
+
+* We don't know the magnitude of the bias term
+
+* We can still estimate it! What can help us estimating MSE?
+
+* The residual sum of squares, `\(SSE(\mathcal{M})\)`!
+
+
+
+
+
+---
+# Mallows `\(C_p\)` statistic
+
+* `\(SSE(\mathcal{M})\)` is **overly optimistic**
+
+* Becomes smaller the bigger the model `\(\mathcal{M}\)` is
+
+* For any sub-model `\(\mathcal{M}\)`, MSE can be estimated by:
+
+`$$n^{-1} SSE(\mathcal{M}) - \hat{\sigma}^2 + 2 \hat{\sigma}^2 |\mathcal{M}|/n$$`
+* `\(\hat{\sigma}^2\)` is the error variance estimate in the **full model** 
+
+
+
+---
+# Mallows `\(C_p\)` statistic
+
+* Best sub-model can minimize the last quantity
+
+* `\(C_p\)` statistic (since `\(n\)` and `\(\hat{\sigma}^2\)` are fixed regarding sub-models):
+
+`$$C_p(\mathcal{M}) = \frac{SSE(\mathcal{M})}{\hat{\sigma}^2} - n + 2 |\mathcal{M}|$$`
+
+---
+# Size of model
+
+* What is `\(|\mathcal{M}|\)`? 
+
+
+
+
+
+
+---
+# Size of model
+
+* What is `\(|\mathcal{M}|\)`? 
+
+* `\(q\)` predictor variables, and the intercept
+
+`$$|\mathcal{M}| = q + 1$$`
+
+
+
+
+---
+# Another popular choices 
+
+* Akaike's information criterion (AIC) (equal to Mallows `\(C_p\)` statistics in the case of (Gaussian) linear regression): 
+
+`$$AIC = 2k - 2 \ln(\hat{L})$$`
+* `\(\hat{L}\)` is the maximum value of the likelihood function for the model
+* k is the number of free parameters, i.e `\(q\)` predictor variables, the intercept, and the constant variance ($k = q + 2$)
+* Bayesian information criterion (BIC):
+
+`$$BIC = k\ln(n) - 2 \ln(\hat{L})$$`
+
+
+
+
+
+
+---
+--- 
+# Limitations
+
+* `\(C_p\)` statistics works when the sample size is much larger than the number of parameters in the model
+
+
+* Cannot handle complex collections of models as in the variable selection (or feature selection) problem in high-dimension 
+
+
+
+
+
+---
+# Searching for the best model
+
+* With having `\(p\)` predictors in the full model, how many sub-models exist?
+
+
+
+
+
+
+---
+# Searching for the best model
+
+* With having `\(p\)` predictors in the full model, how many sub-models exist?
+
+* `\(2^p - 1\)`
+
+* If `\(p = 16\)`, `\(65535\)` models should be tested
+
+* Is there a more elegant way to select the best model?
+
+
+---
+# Searching for the best model
+
+* With having `\(p\)` predictors in the full model, how many sub-models exist?
+
+* `\(2^p - 1\)`
+
+* If `\(p = 16\)`, `\(65535\)` models should be tested
+
+* Is there a more elegant way to select the best model?
+
+* Forward selection, backward selection
+
+
+
+
+
+---
+# Forward selection, backward selection
+
+* Backward selection is computationally more expensive, but can work better
+
+* If `\(p \geq n\)`, forward selection is the way to go
+
+* Can we trust the p-values and similar inferences in the final model?
+
+
+
+
+---
+# Forward selection, backward selection
+
+* Backward selection is computationally more expensive, but can work better
+
+* If `\(p \geq n\)`, forward selection is the way to go
+
+* Can we trust the p-values and similar inferences in the final model?
+
+* No! The effects typically look **too** significant
+
+
+
+---
+--- 
+# Summary
+
+* Linear models 
+
+* Diagnostic plots
+
+* Analysis of residuals
+  
+* Test-statistics and confidence intervals
+
+* F-value, `\(R^2\)`
+
+* Model selection
+
+
+
+
+
+---
+# What else?
+
+* Gauss-Markov theorem
+
+* Robust linear models
+
+* Generalized linear models
+
+* Non-parametric regression
+
+* There is a lot to learn more!
+
+
+
+---
+# Thank You for Attention
+References: 
+* Chapter 4 (likelihood) part 7, Davison, Anthony Christopher. Statistical models. Vol. 11. Cambridge university press, 2003.
+* Chapter 3 (Linear Methods for Regression), Elements of Statistical Learning, Trevor Hastie, Robert Tibshirani, Jerome Friedman, second edition, Jan 2017
+* Chapter 1, Computational statistics script, Peter Bühlmann and Martin Mächler, Seminar for statistics, October 12, 2016
+
+
+&lt;div style="text-align: center"&gt;
+  &lt;img width="400" height="400" src="src/img/Data.gif" style="background:none; border:none; box-shadow:none;"&gt;
+&lt;/div&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

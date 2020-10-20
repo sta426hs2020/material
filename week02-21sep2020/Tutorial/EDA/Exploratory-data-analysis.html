@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Exploratory data analysis</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="STA426" />
+    <script src="libs/header-attrs-2.3/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="src/css/style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Exploratory data analysis
+## DPLYR
+### STA426
+### 2020/09/21
+
+---
+
+
+
+
+# Manipulation data with dplyr
+
+.pull-left[
+
+When working with data you must:
+
+* Figure out what you want to do.
+* Describe those tasks in the form of a computer program.
+* Execute the program.
+
+#### Why do I use dplyr?
+
+* Great for data exploration and transformation
+* Intuitive to write and easy to read, especially when using the “chaining” syntax (covered below)
+* Fast on data frames
+
+```
+install.packages("dplyr")
+library(dplyr)
+```
+]
+.pull-right[
+&lt;div style="text-align: center"&gt;
+&lt;img src="src/img/hex-dplyr.png"&gt;
+&lt;/div&gt;
+]
+
+---
+
+# tidyverse
+
+The tidyverse is an opinionated collection of R packages designed for data science.
+
+&lt;div style="text-align: center"&gt;
+&lt;img src="src/img/tidyverse.png"&gt;
+&lt;/div&gt;
+
+---
+
+# Analysis Footbal Data
+
+```
+library(devtools)
+install_github('jalapic/engsoccerdata', username = "jalapic")
+library(engsoccerdata)
+data(package="engsoccerdata")    # lists datasets currently available
+```
+
+&lt;div style="text-align: center"&gt;
+&lt;img width="853" height="420" src="src/img/fda.jpg"&gt;
+&lt;/div&gt;
+
+---
+
+# engsoccerdata 
+
+```
+Datasets: 
+- england     - Results of all top 4 tier soccer games in England 1888-2017
+- england1939 - Contains results of abandoned 1939/40 season.
+- england5    - Results of 5th tier (conference) from 1999/2000 - 2016/17
+- facup       - Contains all FA Cup ties (not including pre-qualifying rounds) 1871-2016
+- playoffs    - Incldues 'test-matches' 1892-1897 and modern playoffs (1986/87 onwards)
+- spain       - Top flight Spanish League match results 1929-2017
+- italy       - Top flight Italian Serie A League match results 1934-2017
+- germany     - Top flight German Bundesliga 1 League match results 1963-2017 &amp; Bundelsiga
+- holland     - Dutch Eredivisie league match results 1956-2017
+- champs      - European Cup and Champions League results 1955-2017 
+- france      - French Ligue 1 results 1933-2017
+- scotland    - Scotland top 4 tiers 1994-2017
+- portugal    - Portugal top tier 1994-2017
+- belgium     - Belgium top tier 1994-2017
+- turkey      - Turkey top tier 1994-2017
+- greece      - Greece top tier 1994-2017
+- mls         - MLS regular and postseason 1996-2016
+- safrica     - South African  top tier - 2004-2017
+- teamnames   - dataframe of alternative names and abbreviations for each team 
+- mlsconfs    - available in `data-raw` - summary of conference location of each team
+```
+
+---
+
+# Create dplyr local data frame
+
+
+```r
+is.tbl(england)
+```
+
+```
+[1] FALSE
+```
+
+```r
+fdb = as.tbl(england)
+head(fdb,10)
+```
+
+```
+# A tibble: 10 x 12
+   Date  Season home  visitor FT    hgoal vgoal division  tier totgoal goaldif
+   &lt;fct&gt;  &lt;dbl&gt; &lt;fct&gt; &lt;fct&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;fct&gt;    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+ 1 1888…   1888 Accr… Aston … 1-1       1     1 1            1       2       0
+ 2 1889…   1888 Accr… Blackb… 0-2       0     2 1            1       2      -2
+ 3 1889…   1888 Accr… Bolton… 2-3       2     3 1            1       5      -1
+ 4 1888…   1888 Accr… Burnley 5-1       5     1 1            1       6       4
+ 5 1888…   1888 Accr… Derby … 6-2       6     2 1            1       8       4
+ 6 1888…   1888 Accr… Everton 3-1       3     1 1            1       4       2
+ 7 1889…   1888 Accr… Notts … 1-2       1     2 1            1       3      -1
+ 8 1888…   1888 Accr… Presto… 0-0       0     0 1            1       0       0
+ 9 1889…   1888 Accr… Stoke … 2-0       2     0 1            1       2       2
+10 1888…   1888 Accr… West B… 2-1       2     1 1            1       3       1
+# … with 1 more variable: result &lt;fct&gt;
+```
+
+---
+
+# dplyr: Six Core Functions
+
+dplyr aims to provide a function for each basic verb of data manipulation:
+
+* `mutate()`    adds new variables that are functions of existing variables
+
+--
+
+* `select()`    picks variables based on their names.
+
+--
+
+* `filter()`    picks cases based on their values.
+
+--
+
+* `summarise()` reduces multiple values down to a single summary.
+
+--
+
+* `arrange()`   changes the ordering of the rows.
+
+--
+
+* `group_by()`  aggregates values by group categories.
+
+---
+
+# Pipe operator %&gt;%
+
+The pipe operator `%&gt;%` from the package `magrittr` enables to “chain” functions together, rather than “nesting” them. You don’t have to use the  `%&gt;%` in dplyr, however it arguably makes your syntax much more readable.
+
+--
+
+The `%&gt;%` passes the returned value from one function as first element to the next function. You can think at `%&gt;%` as a then between two statements. For instance, the statments:
+
+Generate 20 random observations from a normal distribution then sum them up then round the sum to the 1st decimal become
+
+```
+round(sum(rnorm(20)),1)
+20 %&gt;% rnorm() %&gt;% sum() %&gt;% round(1)
+```
+
+--
+
+#### Basic piping
+  
+* `x %&gt;% f` is equivalent to `f(x)`
+* `x %&gt;% f(y)` is equivalent to `f(x, y)`
+* `x %&gt;% f %&gt;% g %&gt;% h` is equivalent to `h(g(f(x)))`
+
+---
+
+# operator
+
+#### The argument placeholder
+
+* `x %&gt;% f(y, .)` is equivalent to `f(y, x)`
+* `x %&gt;% f(y, z = .)` is equivalent to `f(y, z = x)`
+
+--
+
+#### Re-using the placeholder for attributes
+
+It is straight-forward to use the placeholder several times
+in a right-hand side expression. 
+
+`x %&gt;% f(y = nrow(.), z = ncol(.))` is equivalent to 
+   `f(x, y = nrow(x), z = ncol(x))`
+
+--
+
+#### Building (unary) functions
+
+Any pipeline starting with the `.` will return a function which can later
+be used to apply the pipeline to values.
+
+
+```r
+f &lt;- . %&gt;% cos %&gt;% sin 
+# is equivalent to 
+f &lt;- function(.) sin(cos(.)) 
+```
+
+---
+# Extract home games
+
+
+```r
+fdb %&gt;% 
+  filter(home == "Manchester United" ) -&gt; HManU 
+HManU
+```
+
+```
+# A tibble: 2,240 x 12
+   Date  Season home  visitor FT    hgoal vgoal division  tier totgoal goaldif
+   &lt;fct&gt;  &lt;dbl&gt; &lt;fct&gt; &lt;fct&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;fct&gt;    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+ 1 1893…   1892 Manc… Accrin… 3-3       3     3 1            1       6       0
+ 2 1892…   1892 Manc… Aston … 2-0       2     0 1            1       2       2
+ 3 1892…   1892 Manc… Blackb… 4-4       4     4 1            1       8       0
+ 4 1892…   1892 Manc… Bolton… 1-0       1     0 1            1       1       1
+ 5 1892…   1892 Manc… Burnley 1-1       1     1 1            1       2       0
+ 6 1892…   1892 Manc… Derby … 7-1       7     1 1            1       8       6
+ 7 1892…   1892 Manc… Everton 3-4       3     4 1            1       7      -1
+ 8 1893…   1892 Manc… Nottin… 1-3       1     3 1            1       4      -2
+ 9 1892…   1892 Manc… Notts … 1-3       1     3 1            1       4      -2
+10 1893…   1892 Manc… Presto… 2-1       2     1 1            1       3       1
+# … with 2,230 more rows, and 1 more variable: result &lt;fct&gt;
+```
+
+```r
+dim(HManU)
+```
+
+```
+[1] 2240   12
+```
+
+---
+# Extract all records of team
+
+
+```r
+fdb %&gt;%
+  filter(home == "Manchester United" | visitor == "Manchester United") -&gt; ManU 
+ManU
+```
+
+```
+# A tibble: 4,480 x 12
+   Date  Season home  visitor FT    hgoal vgoal division  tier totgoal goaldif
+   &lt;fct&gt;  &lt;dbl&gt; &lt;fct&gt; &lt;fct&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;fct&gt;    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+ 1 1892…   1892 Accr… Manche… 2-2       2     2 1            1       4       0
+ 2 1893…   1892 Asto… Manche… 2-0       2     0 1            1       2       2
+ 3 1892…   1892 Blac… Manche… 4-3       4     3 1            1       7       1
+ 4 1892…   1892 Bolt… Manche… 4-1       4     1 1            1       5       3
+ 5 1892…   1892 Burn… Manche… 4-1       4     1 1            1       5       3
+ 6 1893…   1892 Derb… Manche… 5-1       5     1 1            1       6       4
+ 7 1892…   1892 Ever… Manche… 6-0       6     0 1            1       6       6
+ 8 1893…   1892 Manc… Accrin… 3-3       3     3 1            1       6       0
+ 9 1892…   1892 Manc… Aston … 2-0       2     0 1            1       2       2
+10 1892…   1892 Manc… Blackb… 4-4       4     4 1            1       8       0
+# … with 4,470 more rows, and 1 more variable: result &lt;fct&gt;
+```
+
+```r
+dim(ManU)
+```
+
+```
+[1] 4480   12
+```
+
+---
+# Select columns with select()
+
+
+```r
+ManU %&gt;%
+  select(home,visitor,FT)
+```
+
+```
+# A tibble: 4,480 x 3
+   home              visitor           FT   
+   &lt;fct&gt;             &lt;fct&gt;             &lt;fct&gt;
+ 1 Accrington F.C.   Manchester United 2-2  
+ 2 Aston Villa       Manchester United 2-0  
+ 3 Blackburn Rovers  Manchester United 4-3  
+ 4 Bolton Wanderers  Manchester United 4-1  
+ 5 Burnley           Manchester United 4-1  
+ 6 Derby County      Manchester United 5-1  
+ 7 Everton           Manchester United 6-0  
+ 8 Manchester United Accrington F.C.   3-3  
+ 9 Manchester United Aston Villa       2-0  
+10 Manchester United Blackburn Rovers  4-4  
+# … with 4,470 more rows
+```
+
+---
+# Select sequence of columns
+
+
+```r
+ManU %&gt;%
+  select(Date:FT)
+```
+
+```
+# A tibble: 4,480 x 5
+   Date       Season home              visitor           FT   
+   &lt;fct&gt;       &lt;dbl&gt; &lt;fct&gt;             &lt;fct&gt;             &lt;fct&gt;
+ 1 1892-11-26   1892 Accrington F.C.   Manchester United 2-2  
+ 2 1893-03-06   1892 Aston Villa       Manchester United 2-0  
+ 3 1892-09-03   1892 Blackburn Rovers  Manchester United 4-3  
+ 4 1892-12-03   1892 Bolton Wanderers  Manchester United 4-1  
+ 5 1892-09-17   1892 Burnley           Manchester United 4-1  
+ 6 1893-02-11   1892 Derby County      Manchester United 5-1  
+ 7 1892-09-24   1892 Everton           Manchester United 6-0  
+ 8 1893-04-08   1892 Manchester United Accrington F.C.   3-3  
+ 9 1892-11-19   1892 Manchester United Aston Villa       2-0  
+10 1892-11-05   1892 Manchester United Blackburn Rovers  4-4  
+# … with 4,470 more rows
+```
+
+---
+# Find Game Winning Numbers
+
+
+```r
+# Home wins
+ManU %&gt;% filter(home == "Manchester United") %&gt;% 
+  select(team = home, opp = visitor,Season, MG = hgoal,OG = vgoal) -&gt; hw
+# Visitors wins
+ManU %&gt;% filter(visitor == "Manchester United") %&gt;% 
+  select(team = visitor, opp = home,Season, Season, MG = vgoal,OG = hgoal) -&gt; vw
+wman = rbind(hw,vw) # bind home and visitors wins
+head(wman,2)
+```
+
+```
+# A tibble: 2 x 5
+  team              opp             Season    MG    OG
+  &lt;fct&gt;             &lt;fct&gt;            &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1 Manchester United Accrington F.C.   1892     3     3
+2 Manchester United Aston Villa       1892     2     0
+```
+
+```r
+# Total result summary
+wman %&gt;% summarise(Win = sum(MG &gt; OG),Equal = sum(MG == OG),Loose = sum(MG &lt; OG))
+```
+
+```
+# A tibble: 1 x 3
+    Win Equal Loose
+  &lt;int&gt; &lt;int&gt; &lt;int&gt;
+1  2154  1066  1260
+```
+
+---
+
+# Ten high-scoring football match! 
+
+
+```r
+ManU %&gt;%
+  arrange(desc(totgoal)) %&gt;%
+  slice(1:10)
+```
+
+```
+# A tibble: 10 x 12
+   Date  Season home  visitor FT    hgoal vgoal division  tier totgoal goaldif
+   &lt;fct&gt;  &lt;dbl&gt; &lt;fct&gt; &lt;fct&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;fct&gt;    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+ 1 1892…   1892 Manc… Wolver… 10-1     10     1 1            1      11       9
+ 2 1908…   1907 Live… Manche… 7-4       7     4 1            1      11       3
+ 3 1930…   1930 Manc… Newcas… 4-7       4     7 1            1      11      -3
+ 4 1954…   1954 Chel… Manche… 5-6       5     6 1            1      11      -1
+ 5 1895…   1895 Manc… Lincol… 5-5       5     5 2            2      10       0
+ 6 1933…   1933 Grim… Manche… 7-3       7     3 2            2      10       4
+ 7 1960…   1959 Newc… Manche… 7-3       7     3 1            1      10       4
+ 8 2011…   2011 Manc… Arsenal 8-2       8     2 1            1      10       6
+ 9 2013…   2012 West… Manche… 5-5       5     5 1            1      10       0
+10 1895…   1894 Manc… Walsall 9-0       9     0 2            2       9       9
+# … with 1 more variable: result &lt;fct&gt;
+```
+
+---
+
+# The Top 10 Biggest Home Wins
+
+
+```r
+ManU %&gt;% 
+  filter(home == "Manchester United") %&gt;% 
+  arrange(desc(hgoal),vgoal) %&gt;% 
+  slice(1:10)
+```
+
+```
+# A tibble: 10 x 12
+   Date  Season home  visitor FT    hgoal vgoal division  tier totgoal goaldif
+   &lt;fct&gt;  &lt;dbl&gt; &lt;fct&gt; &lt;fct&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;fct&gt;    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+ 1 1892…   1892 Manc… Wolver… 10-1     10     1 1            1      11       9
+ 2 1895…   1894 Manc… Walsall 9-0       9     0 2            2       9       9
+ 3 1898…   1898 Manc… Darwen  9-0       9     0 2            2       9       9
+ 4 1995…   1994 Manc… Ipswic… 9-0       9     0 1            1       9       9
+ 5 1969…   1968 Manc… Queens… 8-1       8     1 1            1       9       7
+ 6 2011…   2011 Manc… Arsenal 8-2       8     2 1            1      10       6
+ 7 1905…   1904 Manc… Bradfo… 7-0       7     0 2            2       7       7
+ 8 1950…   1949 Manc… Aston … 7-0       7     0 1            1       7       7
+ 9 1964…   1964 Manc… Aston … 7-0       7     0 1            1       7       7
+10 1970…   1969 Manc… West B… 7-0       7     0 1            1       7       7
+# … with 1 more variable: result &lt;fct&gt;
+```
+
+---
+
+# Extract distinct Teams
+
+
+```r
+ManU %&gt;%
+  filter(home == "Manchester United") %&gt;% 
+  select(visitor) %&gt;% 
+  distinct()
+```
+
+```
+# A tibble: 84 x 1
+   visitor          
+   &lt;fct&gt;            
+ 1 Accrington F.C.  
+ 2 Aston Villa      
+ 3 Blackburn Rovers 
+ 4 Bolton Wanderers 
+ 5 Burnley          
+ 6 Derby County     
+ 7 Everton          
+ 8 Nottingham Forest
+ 9 Notts County     
+10 Preston North End
+# … with 74 more rows
+```
+
+---
+
+# Extract distinct Games
+
+
+
+```r
+ManU %&gt;% 
+  select(home, visitor) %&gt;% 
+  distinct()
+```
+
+```
+# A tibble: 168 x 2
+   home              visitor          
+   &lt;fct&gt;             &lt;fct&gt;            
+ 1 Accrington F.C.   Manchester United
+ 2 Aston Villa       Manchester United
+ 3 Blackburn Rovers  Manchester United
+ 4 Bolton Wanderers  Manchester United
+ 5 Burnley           Manchester United
+ 6 Derby County      Manchester United
+ 7 Everton           Manchester United
+ 8 Manchester United Accrington F.C.  
+ 9 Manchester United Aston Villa      
+10 Manchester United Blackburn Rovers 
+# … with 158 more rows
+```
+
+---
+
+# Add column
+
+
+```r
+ManU %&gt;% 
+  mutate(gain = goaldif / totgoal) %&gt;% 
+  select(gain,goaldif,totgoal)
+```
+
+```
+# A tibble: 4,480 x 3
+    gain goaldif totgoal
+   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+ 1 0           0       4
+ 2 1           2       2
+ 3 0.143       1       7
+ 4 0.6         3       5
+ 5 0.6         3       5
+ 6 0.667       4       6
+ 7 1           6       6
+ 8 0           0       6
+ 9 1           2       2
+10 0           0       8
+# … with 4,470 more rows
+```
+
+---
+# Randomly sample games by number and fraction
+
+
+```r
+ManU %&gt;%
+  sample_n(2)
+```
+
+```
+# A tibble: 2 x 12
+  Date  Season home  visitor FT    hgoal vgoal division  tier totgoal goaldif
+  &lt;fct&gt;  &lt;dbl&gt; &lt;fct&gt; &lt;fct&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;fct&gt;    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+1 1997…   1996 Blac… Manche… 2-3       2     3 1            1       5      -1
+2 1994…   1994 Chel… Manche… 2-3       2     3 1            1       5      -1
+# … with 1 more variable: result &lt;fct&gt;
+```
+
+--
+
+
+```r
+ManU %&gt;% 
+  sample_frac(0.01) %&gt;% 
+  head(2)
+```
+
+```
+# A tibble: 2 x 12
+  Date  Season home  visitor FT    hgoal vgoal division  tier totgoal goaldif
+  &lt;fct&gt;  &lt;dbl&gt; &lt;fct&gt; &lt;fct&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;fct&gt;    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+1 1993…   1992 Manc… Southa… 2-1       2     1 1            1       3       1
+2 1932…   1932 Manc… Charlt… 1-1       1     1 2            2       2       0
+# … with 1 more variable: result &lt;fct&gt;
+```
+
+---
+# Group a data by one or more variables.
+
+
+```r
+ManU %&gt;% 
+  filter(home == "Manchester United") %&gt;% 
+  group_by(Season,tier) -&gt; mang
+mang
+```
+
+```
+# A tibble: 2,240 x 12
+# Groups:   Season, tier [113]
+   Date  Season home  visitor FT    hgoal vgoal division  tier totgoal goaldif
+   &lt;fct&gt;  &lt;dbl&gt; &lt;fct&gt; &lt;fct&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;fct&gt;    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+ 1 1893…   1892 Manc… Accrin… 3-3       3     3 1            1       6       0
+ 2 1892…   1892 Manc… Aston … 2-0       2     0 1            1       2       2
+ 3 1892…   1892 Manc… Blackb… 4-4       4     4 1            1       8       0
+ 4 1892…   1892 Manc… Bolton… 1-0       1     0 1            1       1       1
+ 5 1892…   1892 Manc… Burnley 1-1       1     1 1            1       2       0
+ 6 1892…   1892 Manc… Derby … 7-1       7     1 1            1       8       6
+ 7 1892…   1892 Manc… Everton 3-4       3     4 1            1       7      -1
+ 8 1893…   1892 Manc… Nottin… 1-3       1     3 1            1       4      -2
+ 9 1892…   1892 Manc… Notts … 1-3       1     3 1            1       4      -2
+10 1893…   1892 Manc… Presto… 2-1       2     1 1            1       3       1
+# … with 2,230 more rows, and 1 more variable: result &lt;fct&gt;
+```
+
+---
+# make summary table
+
+
+```r
+mang %&gt;% 
+  summarise(
+    HAG = round(mean(hgoal),2),
+    HTG = sum(hgoal),
+    HW = sum(result == "H")) -&gt; Hstat
+Hstat
+```
+
+```
+# A tibble: 113 x 5
+# Groups:   Season [113]
+   Season  tier   HAG   HTG    HW
+    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;
+ 1   1892     1  2.6     39     6
+ 2   1893     1  1.93    29     5
+ 3   1894     2  3.47    52     9
+ 4   1895     2  3.2     48    12
+ 5   1896     2  2.47    37    11
+ 6   1897     2  2.8     42    11
+ 7   1898     2  3       51    12
+ 8   1899     2  2.59    44    15
+ 9   1900     2  1.82    31    11
+10   1901     2  1.59    27    10
+# … with 103 more rows
+```
+
+---
+# Table of Manchester United results
+
+
+```r
+ManU %&gt;%
+  filter(visitor == "Manchester United") %&gt;%
+  group_by(Season,tier) %&gt;% 
+  summarise(
+    VAG = round(mean(hgoal),2),
+    VTG = sum(hgoal),
+    VW = sum(result == "H")) -&gt; VStat
+full_join(Hstat,VStat)
+```
+
+```
+# A tibble: 113 x 8
+# Groups:   Season [113]
+   Season  tier   HAG   HTG    HW   VAG   VTG    VW
+    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;
+ 1   1892     1  2.6     39     6  3.33    50    12
+ 2   1893     1  1.93    29     5  2.6     39    14
+ 3   1894     2  3.47    52     9  1.73    26     7
+ 4   1895     2  3.2     48    12  2.8     42    11
+ 5   1896     2  2.47    37    11  1.6     24     8
+ 6   1897     2  2.8     42    11  1.67    25     6
+ 7   1898     2  3       51    12  1.71    29     9
+ 8   1899     2  2.59    44    15  0.94    16     9
+ 9   1900     2  1.82    31    11  1.71    29    13
+10   1901     2  1.59    27    10  2.41    41    12
+# … with 103 more rows
+```
+
+&lt;!-- --- --&gt;
+&lt;!-- # Summary stat between two teams --&gt;
+
+&lt;!-- &lt;div style="text-align: center"&gt; --&gt;
+&lt;!-- &lt;img src="src/img/liverpool-vs-manchester.jpg"&gt; --&gt;
+&lt;!-- &lt;/div&gt; --&gt;
+
+&lt;!-- --- --&gt;
+&lt;!-- # Make a league table --&gt;
+
+&lt;!-- &lt;div style="text-align: center"&gt; --&gt;
+&lt;!-- &lt;img src="src/img/Premier.png"&gt; --&gt;
+&lt;!-- &lt;/div&gt; --&gt;
+
+---
+# Thank You for Attention
+
+Lecture contents and data are taken from [Datacamp](https://www.datacamp.com)
+&lt;div style="text-align: center"&gt;
+  &lt;img width="533" height="459" src="src/img/Data.gif" style="background:none; border:none; box-shadow:none;"&gt;
+&lt;/div&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

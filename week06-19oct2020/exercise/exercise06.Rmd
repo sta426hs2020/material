@@ -1,0 +1,47 @@
+---
+title: "Exercise 6"
+author: "Hubert Rehrauer"
+date: "19 10 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Comparison of Expression Estimates
+
+The data set consists for 3 Normal samples and 3 Treated samples with 2.5 Mio reads each. The reads are simulated to come from genes on the human chromosome 1.
+
+The expression values from featureCounts were created with:
+We use the library `Rsubread` to generate the counts
+```{r, eval=FALSE}
+library(Rsubread)
+countResult1 = featureCounts(..., strandSpecific=0,
+                                 GTF.featureType="exon", GTF.attrType="gene_id", useMetaFeatures=TRUE,
+                                 allowMultiOverlap=TRUE, countMultiMappingReads=FALSE)
+save(countResult1, file="countResult1.RData")
+countResult2 = featureCounts(..., strandSpecific=0,
+                                 GTF.featureType="exon", GTF.attrType="gene_id", useMetaFeatures=TRUE,
+                                 allowMultiOverlap=TRUE, countMultiMappingReads=TRUE, fraction=TRUE)
+save(countResult2, file="countResult2.RData")
+```
+
+The RSEM data were generated with
+```{sh, eval=FALSE}
+rsem-calculate-expression .... --calc-pme --calc-ci --strandedness none ...
+```
+For documentation see: http://deweylab.github.io/RSEM/rsem-calculate-expression.html
+
+
+
+## Exercises
+
+1. Depending on the featureCount mode, how many alignments are ignored during counting?  
+2. Compare the counts from featureCounts with the genelevel counts from RSEM. Which genes have different values?
+3. How does the sum of the counts in RSEM compare to the number of the aligned reads?  
+4. Compute pair-wise correlation of the samples based on the isoform counts and gene level counts
+
+
+

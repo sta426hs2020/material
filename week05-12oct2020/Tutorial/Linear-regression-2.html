@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Linear models</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="STA426" />
+    <script src="libs/header-attrs-2.3/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="src/css/style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Linear models
+## How to validate?
+### STA426
+### 12.10.2020
+
+---
+
+# Geometric interpretation of linear regression 
+
+* Remember that `\(Y\)` is a vector in `\(\mathbb{R}^n\)`
+
+* `\(X\beta\)` describes a p-dimensional subspace `\(\chi\)` in `\(\mathbb{R}^n\)`, when varying `\(\beta \in \mathbb{R}^p\)`
+
+* LSE `\(\hat{\beta}\)` is such that `\(X\hat{\beta}\)` is closest to `\(Y\)` with respesct to the Euclidean distance. In other words, `\(X\hat{\beta}\)` isa the orthogonal projection of `\(Y\)` onto `\(\chi\)`. 
+
+
+* Let `\(P\)` be the mapping from `\(Y\)` to `\(\hat{Y}\)`. 
+
+$$\hat{Y} = X \hat{\beta} = X(X^TX)^{-1} X^T Y $$
+
+* It follows that `\(r = (I - P) Y\)`, and the residuals are the elements of `\(X^\perp\)`
+
+---
+# Geometric interpretation of linear regression 
+
+&lt;img src="./geometric interpretation.png" width="650px" style="display: block; margin: auto;" /&gt;
+
+
+---
+--- 
+# Properties of LSE
+
+* Least squares estimates are random variables
+
+* Your training data is random!
+
+&lt;img src="./LSE is random.png" width="650px" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Properties of LSE
+
+
+* `\(\mathbb{E}[\hat{\beta}] = \beta\)`. So `\(\hat{\beta}\)` is unbiased
+
+
+* `\(\mathbb{E}[\hat{Y}] = \mathbb{E}[Y] = X \beta\)` and `\(\mathbb{E}[r] = 0\)`
+
+
+* `\(cov(\beta) = \sigma^2(X^T X)^{-1}\)`
+
+
+* `\(cov(\hat{Y}) = \sigma^2 P, cov(r) = \sigma^2 (I - P)\)`
+
+
+---
+# variance of the residuals
+
+* We can derive that `\(\mathbb{E}[\Sigma_{i=1}^n r_i^2] = \sigma^2 (n - p)\)`
+
+* Therefore `\(\mathbb{E}[\hat{\sigma}^2] = \mathbb{E}[\Sigma_{i = 1}^n r_i^2/(n - p)] = \sigma^2\)` is unbiased. 
+
+
+
+
+---
+# Distribution of estimates
+
+In the setting that `\(\epsilon_1, \epsilon_2, \cdots, \epsilon_n\)` are i.i.d and coming from `\(\mathcal{N}(0, \sigma^2)\)`, 
+
+* `\(\hat{\beta} \sim \mathcal{N}(\beta, \sigma^2 (X^TX)^{-1})\)`
+
+* `\(\hat{Y} \sim \mathcal{N}_n (X\beta, \sigma^2 P), r \sim \mathcal{N}_n(0, \sigma^2 (I - P))\)`
+
+* `\(\hat{\sigma}^2 \sim \frac{\sigma^2}{n - p} \chi^2_{n - p}\)`
+
+
+---
+# Normality assumption?
+
+* It does not hold often in practice
+
+* With the use of CLT, the last 3 statements are approximately correct
+
+* So we can make confidence intervals and tests for linear model parameters
+
+
+
+
+---
+# Summary of a linear model
+
+
+```r
+income = read.csv("./INCOME-SAVINGS.csv")
+linearmodel = lm(SAVINGS ~ INCOME , data = income)
+summary(linearmodel)
+```
+
+```
+## 
+## Call:
+## lm(formula = SAVINGS ~ INCOME, data = income)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -13036.3  -4958.9   -316.9   5368.1  16969.3 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -1.099e+04  2.459e+03  -4.469 0.000235 ***
+## INCOME       2.970e-01  6.012e-03  49.402  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 7327 on 20 degrees of freedom
+## Multiple R-squared:  0.9919,	Adjusted R-squared:  0.9915 
+## F-statistic:  2441 on 1 and 20 DF,  p-value: &lt; 2.2e-16
+```
+
+
+
+---
+# Tests and confidence regions
+
+* You want to test whether the j'th element is relevant or not
+
+* Suggestions?
+
+
+
+
+---
+# Tests and confidence regions
+
+* You want to test whether the j'th element is relevant or not
+
+* Do a hypothesis test
+
+* What would be our null hypothesis?
+
+
+---
+# Tests and confidence regions
+
+* You want to test whether the j'th element is relevant or not
+
+* Do a hypothesis test
+
+* What would be our null hypothesis?
+
+* `\(H_{0,j}: \beta_j = 0\)` against the alternative?
+
+
+---
+# Tests and confidence regions
+
+* You want to test whether the j'th element is relevant or not
+
+* Do a hypothesis test
+
+* What would be our null hypothesis?
+
+* `\(H_{0,j}: \beta_j = 0\)` against the alternative `\(H_{A,j}: \beta_j \neq 0\)`
+
+* How to test whether we can reject null hypothesis or not?
+
+
+---
+# Hypothesis testing for `\(\hat{\beta}\)`
+
+* We saw that `\(\hat{\beta}_j\)` has a normal distribution. So:
+
+`$$\frac{\hat{\beta}_j}{\sqrt{\sigma^2 (X^TX)^{-1}_{jj}}} \sim \mathcal{N}(0, 1)$$`
+* Under the null hypothesis `\(H_{0,j}\)`.
+
+* But wait, do we know `\(\sigma^2\)`?
+
+
+---
+# Hypothesis testing for `\(\hat{\beta}\)`
+
+* True `\(\sigma\)` is unknown
+
+* Can be estimated `\(\rightarrow\)` replace the estimate with the true one in the formula
+
+* What happens to our test statistics?
+
+
+---
+# Hypothesis testing for `\(\hat{\beta}\)`
+
+* True `\(\sigma\)` is unknown
+
+* Can be estimated `\(\rightarrow\)` replace the estimate with the true one in the formula
+
+* What happens to our test statistics?
+
+* Introducing t-statistic:
+
+`$$T_j =  \frac{\hat{\beta}_j}{\sqrt{\hat{\sigma}^2 (X^TX)^{-1}_{jj}}} \sim t_{n-p}$$`
+
+* Under the null hypothesis `\(H_{0,j}\)`
+
+
+---
+# Confidence interval for `\(\hat{\beta}\)`
+
+* Similar to the t-test, CI can be derived for the unknown parameter `\(\beta_j\)` 
+
+`$$\hat{\beta}_j \pm \sqrt{\hat{\sigma}^2 (X^T X)^{-1}_{jj}}. t_{n-p; 1 - a/2}$$` 
+
+* What does this confidence interval mean?
+
+
+---
+# Confidence interval for `\(\hat{\beta}\)`
+
+* Similar to the t-test, CI can be derived for the unknown parameter `\(\beta_j\)` 
+
+`$$\hat{\beta}_j \pm \sqrt{\hat{\sigma}^2 (X^T X)^{-1}_{jj}}. t_{n-p; 1 - a/2}$$` 
+
+* It covers the true `\(\beta_j\)` with probability `\(1 - \alpha\)` 
+
+
+---
+--- 
+# Example
+
+* Imagine you do a linear regression, and all individual tests do not reject the null-hypotheses. 
+
+* It is inspired to you that some variables have significant effect
+
+* Is the linear model useless in this case?
+
+
+---
+# Example
+
+* We have a paradox because of correlation among the predictor variables
+
+* An individual t-test for `\(H_{0,j}\)` should be interpreted as quantifying the effect of the `\(j\)`th predictor variable after having subtracted the linear effect of all other predictor variables on `\(Y\)`
+
+
+---
+# Is there any effect?
+
+* Test whether there exists _any_ effect from the predictor variables
+
+* suggestions?
+
+
+
+---
+# Is there any effect?
+
+* Test whether there exists _any_ effect from the predictor variables
+
+* Test the simulatenous null hypothesis `\(H_0: \beta_1 = \cdots = \beta_p = 0\)` versus the alternative `\(H_A: \beta_j \neq 0\)` for at least one `\(j \in {2, \cdots, p}\)`. 
+
+`$$||Y - \bar{Y}||^2 = || \hat{Y} - \bar{Y} || ^2 + ||Y - \hat{Y}||^2$$`
+
+* Decomposition of total squared error around the mean
+
+* Regression term, `\(\hat{Y} - \bar{Y}\)` 
+
+* error term, `\(r = Y - \hat{Y}\)`
+ 
+ 
+---
+# ANOVA table
+
+* Do a partial F-test
+
+
+&lt;img src="./ANOVA table.png" width="650px" style="display: block; margin: auto;" /&gt;
+
+`$$F = \frac{||\hat{Y} - \bar{Y}||^2/(p - 1)}{||\hat{Y} - \bar{Y}||^2/(n - p)} \sim F_{p - 1, n - p}$$`
+* In the case of global null hypothesis `\(\mathbb{E}[Y] = const. = \mathbb{E}[\bar{Y}]\)`, therefore the expected mean squared error equals `\(\sigma^2\)` under `\(H_0\)`. 
+
+* Measures the statistical signficance of predictor variables
+
+
+---
+# F-value
+
+
+```r
+fit_0 &lt;- lm(SAVINGS ~ 1 , data = income)
+fit_1 &lt;- lm(SAVINGS ~ INCOME , data = income)
+
+anova(lm(SAVINGS ~ INCOME , data = income) , lm(SAVINGS ~ 1 , data = income))
+```
+
+```
+## Analysis of Variance Table
+## 
+## Model 1: SAVINGS ~ INCOME
+## Model 2: SAVINGS ~ 1
+##   Res.Df        RSS Df   Sum of Sq      F    Pr(&gt;F)    
+## 1     20 1.0737e+09                                    
+## 2     21 1.3209e+11 -1 -1.3102e+11 2440.5 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+
+
+---
+# Coefficient of determination
+
+* Explaining the proportion of the total variation of `\(Y\)` around `\(\bar{Y}\)` which is explained by the regression 
+
+
+`$$R^2 = \frac{|| \hat{Y} - \bar{Y}||^2}{||Y - \bar{Y}||^2}$$`
+
+* Varies between 1 (the best) and 0 (the worst). 
+
+
+---
+# `\(R^2\)` limitations
+
+* Does not indicate if a regression model provides an adequate fit to your data
+
+* i.e. a good model can have low `\(R^2\)` 
+
+* A biased model can have high `\(R^2\)`
+
+* How to increase `\(R^2\)`?
+
+
+---
+# `\(R^2\)` limitations
+
+* Does not indicate if a regression model provides an adequate fit to your data
+
+* i.e. a good model can have low `\(R^2\)` 
+
+* A biased model can have high `\(R^2\)`
+
+* How to increase `\(R^2\)`?
+
+* Add more independent variables!
+
+
+---
+# `\(R^2\)` limitations
+
+&lt;img src="flplinear.gif" width="45%" height="18%" style="display: block; margin: auto;" /&gt;&lt;img src="reslinear.gif" width="45%" height="18%" style="display: block; margin: auto;" /&gt;
+
+
+* Pictures taken from [here](https://statisticsbyjim.com/regression/interpret-r-squared-regression)
+
+---
+# Are low `\(R^2\)` scores always a problem?
+
+
+* No! Some data have inherently greater amount of unexplainable variation.
+
+* For example a data about human behaviour
+
+* If you have a low `\(R^2\)`, can you draw conclusion about the relationship between the variables?
+
+---
+# Are low `\(R^2\)` scores always a problem?
+
+
+* No! Some data have inherently greater amount of unexplainable variation.
+
+* For example a data about human behaviour
+
+* If you have a low `\(R^2\)`, can you draw conclusion about the relationship between the variables?
+
+* Yes! if your independent variables are statistically significant.
+
+
+
+---
+--- 
+# Summary
+
+* Linear models 
+
+* Diagnostic plots
+
+* Analysis of residuals
+  
+* Test-statistics and confidence intervals
+
+* F-value
+
+* `\(R^2\)`
+
+
+---
+# What else?
+
+* Model selection
+
+* Mallows `\(C_p\)` statistics
+
+* Gauss-Markov theorem
+
+* There is a lot to learn more!
+
+
+---
+# Thank You for Attention
+References: 
+* Chapter 1, Computational statistics script, Peter Bühlmann and Martin Mächler, Seminar for statistics, October 12, 2016
+* Chapter 3 (Linear Methods for Regression), Elements of Statistical Learning, Trevor Hastie, Robert Tibshirani, Jerome Friedman, second edition, Jan 2017
+
+&lt;div style="text-align: center"&gt;
+  &lt;img width="400" height="400" src="src/img/Data.gif" style="background:none; border:none; box-shadow:none;"&gt;
+&lt;/div&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
