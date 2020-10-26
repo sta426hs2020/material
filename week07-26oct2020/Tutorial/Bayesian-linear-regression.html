@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Linear models</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="STA426" />
+    <script src="libs/header-attrs-2.3/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="src/css/style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Linear models
+## Bayesian Linear Regression
+### STA426
+### 26.10.2020
+
+---
+
+# Bayes Rule
+
+`$$\mathbb{P}(\theta | X) = \frac{\mathbb{P}(X | \theta) \mathbb{P}(\theta)}{\mathbb{P}(X)}$$`
+
+* `\(\mathbb{P}(X | \theta)\)` is the likelihood of the data given the paramters. This term is maximized in the frequentist approach (MLE). 
+
+* What's the problem of the frequentist approach?
+
+
+---
+# Bayes Rule
+
+`$$\mathbb{P}(\theta | X) = \frac{\mathbb{P}(X | \theta) \mathbb{P}(\theta)}{\mathbb{P}(X)}$$`
+
+* `\(\mathbb{P}(X | \theta)\)` is the likelihood of the data given the paramters. This term is maximized in the frequentist approach (MLE). 
+
+* What's the problem of the frequentist approach?
+
+* MLE doesn't care about overfitting. So you might consider adding regularizer term
+
+---
+# Bayes Rule
+
+`$$\mathbb{P}(\theta | X) = \frac{\mathbb{P}(X | \theta) \mathbb{P}(\theta)}{\mathbb{P}(X)}$$`
+
+* `\(\mathbb{P}(X | \theta)\)` is the likelihood of the data given the paramters. This term is maximized in the frequentist approach (MLE). 
+
+* `\(\mathbb{P}(\theta)\)` is the prior over the parameter. What kind of distribution would you assume for the parameters? How is the variance of the parameter distribution in comparison to the variance in the prior distribution?
+
+
+
+---
+# Bayes Rule
+
+`$$\mathbb{P}(\theta | X) = \frac{\mathbb{P}(X | \theta) \mathbb{P}(\theta)}{\mathbb{P}(X)}$$`
+
+* `\(\mathbb{P}(X | \theta)\)` is the likelihood of the data given the paramters. This term is maximized in the frequentist approach (MLE). 
+
+* `\(\mathbb{P}(\theta)\)` is the prior over the parameter. What kind of distribution would you assume for the parameters? How is the variance of the parameter distribution in comparison to the variance in the prior distribution?
+
+* `\(\mathbb{P}(X) = \int \mathbb{P}(X | \theta) \mathbb{P}(\theta) d\theta\)` is the evidence of our data. It determines ow likely is your data. 
+
+
+
+
+
+---
+# Bayesian Linear regression (BLR)
+
+`$$\mathbb{P}(\beta | Y, X, \sigma) = \frac{\mathbb{P}(Y | \beta, X, \sigma) \mathbb{P}(\beta)}{\int \mathbb{P}(Y | \beta, X, \sigma) \mathbb{P}(\beta) d\beta } \propto \log \mathbb{P}(Y | \beta)  + \log \mathbb{P}(\beta)$$`
+
+* Assume a Gaussian prior, `\(\mathbb{P}(\beta) = \mathcal{N}(0, \Sigma)\)`
+
+* Define the likelihood as a Gaussian, `\(\mathbb{P}(Y|\beta, X, \sigma) = \mathcal{N}(Y | X\beta, \sigma^2 I)\)`
+
+
+
+
+---
+# BLR
+
+* What do we gain from the Bayesian approach?
+
+
+
+
+
+
+---
+# BLR
+
+* What do we gain from the Bayesian approach?
+
+* A predictive uncertainty, since we have our posterior distribution, and not just a single point as in MAP estimation 
+
+* If the prior and the likelihood are Gaussian, the posterior would be also a Gaussian distribution
+
+
+
+
+
+---
+# BLR - Example
+
+
+* Prior: `\(\mathbb{P}(w) = \mathcal{N}(0, I)\)`
+
+* Likelihood: `\(\mathbb{P}(y | x, w, \sigma_n) = \mathcal{N}(y ; w^TX, \sigma^2_n)\)`
+
+* Posterior: `\(\mathbb{P}(w | X, y) = \mathcal{N}(w; \hat{\mu}, \hat{\Sigma}\)`
+
+* `\(\hat{\mu} = (X^TX + \sigma_n^2 I)^{-1}X^Ty\)`
+
+* `\(\hat{\Sigma} = (\sigma_n^{-2} X^TX + I)^{-1}\)`
+
+* We have a full posterior over weights
+
+
+
+---
+# BLR - Prediction
+
+* How can we use the posterior over weights to make predictions over response variables? For test point `\(x^*\)` define `\(f^* = w^T x^*\)` 
+
+* `\(\mathbb{P}(f^* | X, y, x^*) = \mathcal{N}(\hat{\mu}^T x^*, x^{*^T} \hat{\Sigma} x^*)\)`
+
+* and as `\(y^* = f^* + noise\)`, 
+
+`$$\mathbb{P}(y^* | X, y, x^*) = \mathcal{N}(\hat{\mu}^T x^*, x^{*^T} \hat{\Sigma} x^* + \sigma_n^2)$$`
+
+
+
+---
+# BLR - Relation to ridge regression
+
+
+* Do you see any relation to ridge regression?
+
+
+
+
+
+---
+# BLR - Relation to ridge regression
+
+* Do you see any relation to ridge regression?
+
+* Ridge regression can be viewed as having a point mass on `\(w\)` distribution rather than a normal distribution, `\(\hat{w} = argmax_w  \mathbb{P}(w | X, y)\)`
+
+* The prediction will also be a the mode of the posterior in the general case. 
+
+
+
+---
+# BLR - Simulation
+
+* See the notebook
+
+
+
+
+
+---
+# Thank You for Attention
+References: 
+* Chapter 9, section 3, Deisenroth, Marc Peter, A. Aldo Faisal, and Cheng Soon Ong. Mathematics for machine learning. Cambridge University Press, 2020.
+
+* Notebook taken from Probablistic Artificial Intelligence course at ETH, Fall 2020, Prof. Andreas Krause. 
+
+&lt;div style="text-align: center"&gt;
+  &lt;img width="400" height="400" src="src/img/Data.gif" style="background:none; border:none; box-shadow:none;"&gt;
+&lt;/div&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
