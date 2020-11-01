@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Empirical Bayes</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="STA426" />
+    <script src="libs/header-attrs-2.3/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="src/css/style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Empirical Bayes
+## Bayesian models
+### STA426
+### 02.11.2020
+
+---
+
+# Normal hierarchical model
+
+* Consider `\(y_1, y_2, \cdots, y_n\)` satisfy:
+
+$$y_i | \theta_j \sim^{ind} \mathcal{N}(\theta_j, \nu_j), \hspace{0.5cm} \theta_1, \theta_2, \cdots \theta_n | \mu \sim^{iid} \mathcal{N}(\mu, \sigma^2), \hspace{0.5cm} \mu \sim \mathcal{N}(\mu_0, \tau^2) $$
+
+* `\(\nu_1, \cdots, \nu_n, \sigma^2, \tau^2\)` are known
+
+* the last two are hyperparameters that control the uncertainty injected at the top level of the hierarchy
+ 
+ 
+ 
+ 
+
+---
+# Normal hierarchical model
+
+* `\(y_j\)` have different variances, but their means are supposed to be indistinguishable and modeled as exchangable (refer to the book for more description)
+
+* `\((\mu, \theta^T, y^T)^T\)` has a multi-variate normal dimension of `\(2n + 1\)` 
+
+* mean and variance of the above distribution can be found analytically
+
+* The posterior density `\((\mu, \theta^T)^T\)` given `\(y\)` is also normal with a mean and variance that can be derived analytically
+
+
+
+
+
+---
+# Normal hierarchical model
+
+* `\(\mathbb{E}[\mu | y]\)` is given as follows:
+
+`$$\frac{\frac{\mu_0}{\tau^2} + \Sigma y_j / (\sigma^2 + \nu_j)}{\frac{1}{\tau^2} + \Sigma 1/(\sigma^2 + \nu_j)}$$`
+
+* Is a weighted mean of its prior mean `\(\mu_0\)` and of the `\(y_j\)` according to their precision conditional on `\(\mu\)`
+
+* What happens if `\(\tau^2\)` is very large?
+
+
+
+
+---
+# Borrowing the strength
+
+`$$\mathbb{E}[\theta_j | y] = \mathbb{E}[\mu | y] + \frac{\sigma^2}{\sigma^2 + \nu_j}{y_j - \mathbb{E}[\mu | y]}$$`
+
+* Weighted average of `\(\mathbb{E}[\mu | y]\)` and `\(y_j\)`, showing shrinkage of `\(y_j\)` towards `\(\mathbb{E}[\mu | y]\)` by an amount that depends on `\(\nu_j\)`
+
+* As `\(\nu_j \rightarrow 0\)` , `\(\mathbb{E}[\theta_j | y] \rightarrow y_j\)`, while as `\(\nu_j \rightarrow \infty\)`, `\(\mathbb{E}[\theta_j | y] \rightarrow \mathbb{E}[\mu | y]\)`
+
+* Borrowing the strength
+
+* All the data combine to estimate common parameters such as `\(\mu\)`, while estimates of individual parameters such as `\(\theta_j\)` are shrunk towards common values by amounts that depends on the precision of the corresponding observation, represented by `\(\nu_j\)`
+
+
+
+
+
+
+
+---
+# Empirical Bayes
+
+* At the cost of specifying prior distribution in 2 levels, the idea of borrowing strength increases the precision of parameter estimation
+
+* Priors on hyper parameters are hard to verify
+
+* Can we estimate the hyperparamters from the data?
+
+
+
+
+
+
+
+
+
+
+
+---
+# Empirical Bayes
+
+* At the cost of specifying prior distribution in 2 levels, the idea of borrowing strength increases the precision of parameter estimation
+
+* Priors on hyper parameters are hard to verify
+
+* Can we estimate the hyperparamters from the data?
+
+* Yes!
+
+* Empirical Bayes can be seen as an approximation to fully Bayesian treatment of a hierarchical model
+
+
+
+
+
+
+
+---
+# Empirical Bayes 
+
+* Empirical Bayes sets the parameters in the highest level of hierarchy to their most likely value, instead of being integrated out
+
+* Also known as maximum marginal likelihood, represents one approach for setting hyperparameters
+
+* Concretely, this is empirical Bayes task: learning an appropriate prior distribution from ongoing statistical experience, rather than knowing it by assumption.
+
+* Something between frequentist and Bayesian approach
+
+
+
+
+
+
+
+
+
+---
+# Example - Normal distribution
+
+`$$y_1, y_2, \cdots, y_n | \theta_1, \theta_2, \cdots, \theta_n \sim^{ind} \mathcal{N}(\theta_j, \nu_j), \hspace{0.5cm} \theta_1, \theta_2, \cdots \theta_n \sim^{iid} \mathcal{N}(\mu, \tau^2)$$`
+
+* where the `\(\nu_j\)` are known positive constants. Suppose `\(\tau^2\)` is known for now
+
+* The conditional distribution of `\(\theta_j\)` given `\(y\)` is:
+
+`$$\mathcal{N}(\xi_j \mu +(1−\xi_j)y_j,(1−\xi_j)\nu_j), \hspace{0.5cm}\text{with} \hspace{0.2cm}\xi_j = \frac{\nu_j}{\nu_j + \tau^2}, j =1,\cdots,n$$`
+
+
+
+
+
+
+---
+--- 
+# Example - Normal distribution
+
+* `\(y_j\)` are marginally independent and normally distributed `\(\mathcal{N}(\mu , \nu_j + \tau^2)\)`. So the MLE of `\(\mu\)` is as follows:
+
+`$$\hat{\mu} = \hat{\mu}(\tau^2) = \frac{\Sigma_{j = 1}^n y_j/(\nu_j + \tau^2)}{\Sigma_{j = 1}^n 1/(\nu_j + \tau^2)}$$`
+
+* To get the empirical Bayes estimate of `\(\theta_j\)`, we substitute `\(\hat{\mu}\)` by `\(\mathbb{E}[\theta_j | y]\)`. The estimate will be:
+
+`$$\tilde{\theta_j} = \xi_j \hat{\mu} + (1 - \xi_j) y_j = \hat{\mu} + (1 - \xi_j)(y_j - \hat{\mu})$$`
+* Let's analyze it!
+
+
+
+
+
+
+---
+# Example - Normal distribution
+
+* When `\(\xi_j = 0\)`, then `\(\tilde{\theta_j} = (1 - \xi_j) y_j\)` is unbiased for `\(\theta_j\)`
+
+* When `\(\xi_j &gt; 0\)`, gives non-zero shrinkage and biased estimation of `\(\theta_j\)`
+
+* The hope is that shrinkage towards a common mean would reduce the overal mean squared error
+
+* Degree of shrinkage towards `\(\hat{\mu}\)` depends on `\(\nu_j / \tau^2\)`. It does not depends on the data! 
+
+* So if `\(y_j\)` would be very different, doubt would be cast on the model
+
+
+
+---
+# Example - Normal distribution
+
+* When `\(\tau^2\)` is unknown, the profile log-likelihood is
+
+`$$\mathcal{l_p}(\tau^2) \equiv -\frac{1}{2} \Sigma_{j = 1}^n \log(\nu_j + \tau^2) - \frac{1}{2} \Sigma_{j = 1}^n (y_j - \hat{\mu}(\tau^2))^2/(\nu_j + \tau^2), \hspace{0.5cm} \tau^2 \geq 0$$`
+* MLE can be derived 
+
+* if `\(\hat{\tau}^2 = 0\)`, the data gives no evidence of variation in `\(\theta_j\)` and all `\(y_i\)` have mean `\(\mu\)`, and all `\(\theta_j\)` will shrunk towards `\(\hat{\mu}\)`
+
+
+
+---
+# Example - Normal distribution
+
+* If `\(\hat{\tau}^2 &gt; 0\)`, then `\(\xi_j\)` is replaced by `\(\nu_j / (\nu_j + \hat{\tau}^2)\)` in the equation for `\(\tilde{\theta_j}\)`
+
+* As `\(0 \leq \nu_j / (\nu_j + \hat{\tau}^2) \leq 1\)`, `\(\theta_j\)` lies between `\(y_j\)` and `\(\hat{\mu}\)`
+
+* Confidence intervals can be derived by replacing `\(\mu\)` and `\(\tau^2\)` by their estimates. But the coverage will be lower than the nominal level! Since the variability in `\(\hat{\mu}\)` and `\(\hat{\tau}^2\)` is unaccounted for.
+
+
+
+
+
+---
+# Empirical Bayes methods
+
+* In more general terms:
+
+* Modeling on the `\(\theta\)` scale, called **g-modeling**
+
+* Normally used to derive theorems regarding empirical Bayes
+
+* Modeling on the `\(x\)` scale, called **f-modeling**
+
+* Normally used in practice
+
+
+
+
+
+
+---
+# F-modeling
+
+&lt;img src="./fmodeling1.png" width="65%" height="28%" style="display: block; margin: auto;" /&gt;&lt;img src="fmodeling2.png" width="65%" height="28%" style="display: block; margin: auto;" /&gt;
+
+
+
+
+
+
+
+
+
+
+---
+# Thank You for Attention
+References: 
+* Chapter 12 part 4 and 5, Davison, Anthony Christopher. Statistical models. Vol. 11. Cambridge university press, 2003.
+
+* Efron, Bradley. Empirical Bayes modeling, computation and accuracy. Division of Biostatistics, Stanford University, 2013.
+
+
+&lt;div style="text-align: center"&gt;
+  &lt;img width="400" height="400" src="src/img/Data.gif" style="background:none; border:none; box-shadow:none;"&gt;
+&lt;/div&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
