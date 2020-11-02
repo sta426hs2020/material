@@ -100,7 +100,7 @@ $$y_i | \theta_j \sim^{ind} \mathcal{N}(\theta_j, \nu_j), \hspace{0.5cm} \theta_
 ---
 # Borrowing the strength
 
-`$$\mathbb{E}[\theta_j | y] = \mathbb{E}[\mu | y] + \frac{\sigma^2}{\sigma^2 + \nu_j}{y_j - \mathbb{E}[\mu | y]}$$`
+`$$\mathbb{E}[\theta_j | y] = \mathbb{E}[\mu | y] + \frac{\sigma^2}{\sigma^2 + \nu_j}(y_j - \mathbb{E}[\mu | y])$$`
 
 * Weighted average of `\(\mathbb{E}[\mu | y]\)` and `\(y_j\)`, showing shrinkage of `\(y_j\)` towards `\(\mathbb{E}[\mu | y]\)` by an amount that depends on `\(\nu_j\)`
 
