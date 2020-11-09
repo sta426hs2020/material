@@ -5,3 +5,4 @@
 * Collaborative project (with Mark and a group from USZ): Analysis of single cell RNA-seq data: 1) to determine a suitable list of genes for in situ experiments; 2) integrating the local data with public datasets to find signatures of drug resistance (could actually be two projects)
 * Methods project: understanding whether gene selection has an impact on performance for [SingleR](https://bioconductor.org/packages/release/bioc/html/SingleR.html) cell type prediction
 * Collaborative project (with Mark and a group from USZ): Analysis of single cell CITE-seq data: goals to be determined (roughly, do QC of the data, determine cell types, compare cell type compositions between normal, precursor, cancer cells)
+* Methods project: compare methods to arrive at sets of marker genes (single cell RNA-seq)
