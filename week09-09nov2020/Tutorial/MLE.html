@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Maximum likelihood estimator and asymptotic efficiency</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="STA426" />
+    <script src="libs/header-attrs-2.3/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="src/css/style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Maximum likelihood estimator and asymptotic efficiency
+## Likelihood theory
+### STA426
+### 09.11.2020
+
+---
+
+# Maximum likelihood estimator
+
+* MLE, `\(\hat{\theta}\)`, often satisfies the likelihood equation:
+
+`$$\frac{\partial \mathcal{l}(\hat{\theta})}{\partial \theta} = 0$$`
+
+* We should verify that `\(d^2 \mathcal{l}(\hat{\theta})/ d\theta^2 &gt; 0\)`, i.e. the likelihood function should be strictly concave
+
+* In the case of strictly concave function, there exists only one minimum
+
+* Gradient descent could be applied to find the maximum
+
+* But we don't know the true `\(\theta^0\)`
+
+
+
+
+---
+# MLE and overfitting
+
+* When calculating MLE, everything is conditioned on the current data
+
+`$$\mathbb{P}(y | X, \theta)$$`
+
+* There is variation in the data that we receive from the true distribution
+
+* Imagine keeping th original predictor and adding additional noise
+
+* Example: predicting the number of car crashes on the given day. Let's add the distance of the earth to other planets in the data. Will the likelihood function decrease after adding new features?
+
+
+
+
+
+
+
+---
+# Consistency
+
+* Assume that we regularity conditions are satisfied 
+
+* as `\(n \rightarrow \infty\)` there is a value of `\(\hat{\theta}\)` of `\(\theta\)` such that `\(\mathcal{l}(\hat{\theta})\)` is a local maximum of `\(\mathcal{l}(\theta)\)`, and:
+
+`$$\mathbb{P}(\hat{\theta}\rightarrow \theta^0) = 1$$`
+
+* What does this mean?
+
+
+---
+# Consistency
+
+* as `\(n \rightarrow \infty\)` there is a value of `\(\hat{\theta}\)` of `\(\theta\)` such that `\(\mathcal{l}(\hat{\theta})\)` is a local maximum of `\(\mathcal{l}(\theta)\)`, and:
+
+`$$\mathbb{P}(\hat{\theta}\rightarrow \theta^0) = 1$$`
+
+* What does this mean?
+
+* `\(\hat{\theta}\)` is a strongly consistent estimator of `\(\theta\)`
+
+
+
+---
+# Consistency
+
+* Convergence in probability:
+
+* The probability of an “unusual” outcome becomes smaller and smaller as the sequence progresses.
+
+* Example: The weak law of large numbers
+
+
+
+
+
+---
+# Asymptotic normality
+
+* Under the regularity conditions, regardless of the distribution of the likelihood, for large `\(n\)`, 
+
+`$$\hat{\theta} \sim \mathcal{N}(\theta^0, I(\theta_0)^{-1})$$`
+
+* Requires smoothness of certain log-likelihood derivatives
+
+* Confidence intervals for `\(\theta^0\)` can be derived
+
+
+
+
+---
+# Fisher information
+
+* `\(I(\theta)\)` is the expected curvature of the likelihood function, i.e. the expected or Fisher information
+
+`$$I(\theta) = \mathbb{E}[- \frac{d^2 \mathcal{l}(\theta)}{d\theta^2}]$$`
+
+* Is derived in a close form for many known distributions
+
+
+* Is the variance matrix of the score vector `\(U(\theta) = \frac{\partial \mathcal{l}(\theta)}{\partial \theta}\)`
+
+* `\(J(\theta) = -\frac{\partial^2 \mathcal{l}(\theta)}{\partial \theta \partial \theta^T}\)` is also known as the observed information
+
+
+
+
+---
+# Example
+
+* Repeated sampling likelihood inference for the exponential mean
+
+* `\(\mathcal{l}(\theta) \equiv -n (\log(\theta) + \bar{y}/\theta)\)`, so `\(\hat{\theta} = \bar{y}\)`
+
+* `\(J(\theta) = n(2\bar{y}/\theta^3 - 1/\theta^2), \hspace{0.5cm} I(\theta) = n/\theta^2\)`
+
+
+* In the example, `\(n = 10, \theta^0 = 1\)`
+
+* 5000 replicates (5000 MLE)
+
+* `\(W(\theta^0) = - 2 \log RL(\theta^0)\)` is assumed to have a `\(\tilde{\chi}^2_1\)`
+
+
+
+---
+# Example
+
+
+
+&lt;img src="./MLE-exponential.png" width="65%" height="28%" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Efficiency of estimators
+
+* Suppose that we might adopt two sampling schemes
+
+* Interested in which estimator needs less data to pin down the parameter to a given range
+
+* If `\(\theta\)` is a scalar, the asymptotic efficiency of a sampling scheme A relative to sampling scheme B is:
+
+`$$\frac{I_A(\theta)}{I_B(\theta)}$$`
+
+
+---
+# Efficiency of estimators - example
+
+* The number of vehicles pass an observer on a country road
+
+* Can be modeled as a Poisson process of rate `\(\lambda\)` vehicles/hour
+
+* Observer A counts how many cars pass by in a period of `\(t_0\)` time
+
+* Observer B records the time at which they pass
+
+
+
+
+
+---
+# Efficiency of estimators - example
+
+* Total number of events: `\(N\)`
+
+* For the observer A: A Poisson process of rate `\(\lambda\)` is observed for a period of length `\(t_0\)`
+
+* Has a poisson distribution with mean `\(\lambda t_0\)`
+
+`$$L_A(\lambda) = \frac{(\lambda t_0)^N}{N!} e^{-t\lambda_0}$$`
+
+
+
+---
+# Efficiency of estimators - example
+
+* For observer B, the times between events in a Poisson process of rate `\(\lambda\)` have independent exponential distributions with density `\(\lambda e^{-\lambda u},u &gt; 0\)`
+
+* If B records the passing time `\(0 &lt; t_1 &lt; ··· &lt; t_N &lt; t_0\)`,the likelihood is:
+
+`$$L_B(\lambda) = \lambda e^{-\lambda t_1} \times \lambda e^{-\lambda (t_2 - t1)} \times \cdots \lambda e^{-\lambda (t_N - t_{N-1})} \times e^{-\lambda(t_0 - t_N)}$$`
+
+* It simplifies to
+
+`$$L_B(\lambda) = \lambda^N e^{-\lambda t_0}$$`
+
+
+---
+# Efficiency of estimators - example
+
+
+* The observed and the expected information for both of the likelihood functions is
+
+`$$J(\theta) = N/\lambda^2, \hspace{0.5cm} I(\lambda) = t_0/\lambda$$`
+
+* The likelihood functions contain the same observed and expected information
+
+* no information is lost by recording only the number of cars!
+
+* In other words, under either sampling scheme, the statistic `\(N\)` is sufficient for `\(\lambda\)`
+
+
+
+---
+# Efficiency of estimators - example
+
+
+* Check the example of censoring in the book, example 4.20
+
+* How much information we loose with censoring a widget's lifetime
+
+* In the censored data `\(Y = min(T, c)\)`
+
+`$$\frac{I_c{(\lambda)}}{I_{\infty}(\lambda)} = 1 - e^{-\lambda c}$$`
+
+
+ 
+---
+# Thank You for Attention
+References: 
+* Chapter 4, part 1, 2, and 3. Davidson, Anthony Christopher. Statistical models. Vol. 11. Cambridge university press, 2003.
+
+&lt;div style="text-align: center"&gt;
+  &lt;img width="400" height="400" src="src/img/Data.gif" style="background:none; border:none; box-shadow:none;"&gt;
+&lt;/div&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
