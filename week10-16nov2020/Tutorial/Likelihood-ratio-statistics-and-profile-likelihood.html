@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Likelihood ratio statistics, profile likelihood</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="STA426" />
+    <script src="libs/header-attrs-2.3/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="src/css/style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Likelihood ratio statistics, profile likelihood
+## Likelihood theory
+### STA426
+### 16.11.2020
+
+---
+
+# LR statistics
+
+* Suppose that our model is determined by a parameter `\(\theta\)` of dimension `\(p\)`
+
+* We want to have an approximate of the true parameter for finite samples
+
+* Remember that the true parameter, `\(\theta^0\)` is unknown
+
+* Providing the assymptotic normality conditions in large samples, the likelihood ratio statistics  
+
+`$$W(\theta^0) = -2\log RL(\theta^0) = 2{\mathcal{l}(\hat{\theta}) - \mathcal{l}(\theta^0)}$$`
+
+has an approximate chi-squared distribution on p degrees of freedom under repeated sampling of data from the model.
+
+
+
+---
+# LR statistics
+
+* In other words, as `\(I(\theta^0) \rightarrow \infty\)`,
+
+`$$W(\theta^0) \xrightarrow{D} \chi^2_p$$`
+
+* Convergence in distribution?
+
+
+
+
+
+
+---
+# LR statistics
+
+* In other words, as `\(I(\theta^0) \rightarrow \infty\)`,
+
+`$$W(\theta^0) \xrightarrow{D} \chi^2_p$$`
+
+* Convergence in distribution?
+
+* expect to see the next outcome in a sequence of random experiments becoming better and better modeled by a given probability distribution.
+
+`$$lim_{n\rightarrow \infty} F_n(x) = F(x)$$`
+
+* Example: CLT
+
+
+
+
+---
+# Confidence regions
+
+* LR statistics can be used to provide confidence regions for `\(\theta^0\)`. For if `\(W(\theta^0) \sim \chi^2_p\)`, then
+
+`$$\mathbb{P}(W(\theta^0) \leq c_p (1 - 2\alpha) \doteq 1 - 2\alpha$$`
+
+* `\(c_p(\alpha)\)` denotes the α quantile of the `\(\chi_p^2\)` distribution
+
+* What does it mean?
+
+
+
+---
+# Confidence regions
+
+* LR statistics can be used to provide confidence regions for `\(\theta^0\)`. For if `\(W(\theta^0) \sim \chi^2_p\)`, then
+
+`$$\mathbb{P}(W(\theta^0) \leq c_p (1 - 2\alpha) \doteq 1 - 2\alpha$$`
+* What does it mean?
+
+* values of `\(\theta\)` for which `\(W(\theta) ≤ c_p(1 − 2\alpha)\)` may be regarded as ‘plausible’ at the `\((1 − 2\alpha)\)` level
+
+* Equivalently, the set 
+`$$\{\theta: \mathcal{l}(\theta) \geq \mathcal{l}(\hat{\theta}) - \frac{1}{2} c_p(1 - 2\alpha)\}$$`
+
+
+is a `\((1 − 2\alpha)\)` confidence region for the unknown `\(\theta\)`.
+
+
+
+
+---
+# Example - Spring failure
+
+* (Example 1.2) The spring failure times at stress `\(950 N/mm^2\)`  are:
+`$$225, 171, 198, 189, 189, 135, 162, 135, 117, 162$$`
+
+* We model the failure time by an exponential density `\(f(y,\theta)= \theta^{-1} e^{-\frac{y}{\theta}}, y &gt; 0, \theta &gt; 0\)`
+
+
+&lt;img src="./Likelihood.png" width="45%" height="20%" style="display: block; margin: auto;" /&gt;
+
+
+
+
+---
+# Example - Spring failure
+
+* Based on the asymptotic normality, we can derive a confidence interval:
+
+`$$(\hat{\theta} - z_{1-\alpha} I(\hat{\theta})^{-\frac{1}{2}}, \hat{\theta} - z_{\alpha} I(\hat{\theta})^{-\frac{1}{2}})$$`
+* `\(I(\hat{\theta}) = n/\bar{y}^2\)`
+
+* For `\(n = 10, \hat{\theta} = \bar{y} = 168.3\)`, the `\(95\%\)` CI would be: `\((64.0, 272.6)\)`
+
+* The CI is symmetric around `\(\hat{\theta}\)`
+
+
+
+---
+# Example - Spring failure
+
+&lt;img src="./RL.png" width="45%" height="20%" style="display: block; margin: auto;" /&gt;
+
+
+* The `\(95\%\)` CI based on `\(W(\theta)\)` is `\((96, 335)\)`
+
+* Not symmetric around `\(\bar{y} = 168.3\)`
+
+* The difference between these two CIs would vanish when the sample size gets bigger
+
+* it can be important to capture the asymmetry of `\(\mathcal{l}(\theta)\)` when `\(n\)` is small or moderate. 
+
+---
+# Profile likelihood
+
+* All elements of the parameter vector are not always treated equally
+
+* Assume `\(\theta^T= (\psi^T, \lambda^T)\)`,  and `\(\psi\)` is a `\(p\times 1\)` vector of parameters of interest and `\(\lambda\)` is a `\(q \times 1\)` vector of nuisance parameters
+
+* What are the nested models?
+
+
+
+
+
+---
+# Profile likelihood
+
+* All elements of the parameter vector are not always treated equally
+
+* Assume `\(\theta^T= (\psi^T, \lambda^T)\)`,  and `\(\psi\)` is a `\(p\times 1\)` vector of parameters of interest and `\(\lambda\)` is a `\(q \times 1\)` vector of nuisance parameters
+
+* Two models are said to be nested if one reduces to the other when certain parameters are fixed
+
+* Consider  `\((\psi^0, \lambda)\)`  is nested in `\((\psi, \lambda)\)`, where `\(\psi^0\)` is fixed
+
+* How dp you compare `\(\mathcal{l} (\psi^0, \hat{\lambda_{\psi^0}})\)` and `\(\mathcal{l}(\hat{\psi}, \hat{\lambda})\)`
+
+
+
+---
+# Profile likelihood
+
+* Likelihood will not decrease by adding more parameters, so
+
+`$$\mathcal{l} (\psi^0, \hat{\lambda_{\psi^0}}) \leq \mathcal{l}(\hat{\psi}, \hat{\lambda})$$`
+
+* Often the is scalar or has much smaller dimension than the nuisance parameter, `\(\lambda\)`
+
+* But how can we compare them? When is a nested model sufficient for our modeling? Can we model it statistically?
+
+
+
+---
+# Example - Weibull distribution
+
+* Has two parameters `\(\alpha, \theta\)`
+
+* Reduces to exponential density when `\(\alpha = 1\)`
+
+* In terms of our notation, `\(\alpha = \psi, \lambda = \theta\)` with `\(\psi^0 =1\)`
+
+
+&lt;img src="./Weibull.png" width="45%" height="20%" style="display: block; margin: auto;" /&gt;
+
+* Evidently the likelihood reaches its maximum away from the exponential submodel
+
+
+
+
+---
+# Generalized likelihood ratio statistic
+
+* An statistic to compare two nested models is the log ratio of the maximum likelihoods,
+
+`$$W_p(\psi^0) = 2\{\mathcal{l}(\hat{\psi}, \hat{\lambda}) - \mathcal{l} (\psi^0, \hat{\lambda_{\psi^0}}) \}$$`
+
+* For regular models, 
+
+`$$W_p(\psi^0) \xrightarrow{D} \chi^2_p$$`
+
+
+
+---
+# CI for the parameter of interest
+
+* We wish to form a confidence region for the true value `\(\psi^0\)` regardless of `\(\lambda\)`
+
+* Fix `\(\psi\)`, and fine the maximum likelihood for `\(\lambda\)`
+
+* The profile log likelihood:
+
+`$$\mathcal{l_p}(\psi) = max_\lambda \mathcal{l}(\psi, \lambda) = \mathcal{l}(\psi, \hat{\lambda_\psi})$$`
+
+* The confidence region for `\(\psi^0\)` can be based on `\(\mathcal{l_p}\)` for regular models
+
+
+
+
+---
+
+# CI for the parameter of interest
+
+* A possible `\((1 - 2\alpha)\)` CI for `\(\psi^0\)` could be:
+
+`$$\{\psi: \mathcal{l_p}(\psi) \geq \mathcal{l_p}(\hat{\psi}) - \frac{1}{2} c_p (1 - 2\alpha)\}$$`
+
+
+
+
+
+---
+# Example - Normal distribution
+
+* Reminder: the log likelihood for a normal sample `\(y_1, y_2, \cdots, y_n\)` is
+
+`$$\mathcal{l}(\mu, \sigma^2) \equiv  -\frac{1}{2} \{n \log \sigma^2 + \frac{1}{\sigma^2}\Sigma_{j = 1}^n (y_j - \mu)^2\}$$`
+
+* To use the profile log likelihood to find a confidence region for `\(\mu\)`, what would be our `\(\psi\)` and `\(\lambda\)`?
+
+
+
+
+
+---
+# Example - Normal distribution
+
+* Reminder: the log likelihood for a normal sample `\(y_1, y_2, \cdots, y_n\)` is
+
+`$$\mathcal{l}(\mu, \sigma^2) \equiv  -\frac{1}{2} \{n \log \sigma^2 + \frac{1}{\sigma^2}\Sigma_{j = 1}^n (y_j - \mu)^2\}$$`
+
+* To use the profile log likelihood to find a confidence region for `\(\mu\)`, what would be our `\(\psi\)` and `\(\lambda\)`?
+
+* `\(\psi = \mu, \lambda = \sigma^2\)`
+
+* For a fixed `\(\mu\)`, the MLE for `\(\sigma^2\)` is:
+
+`$$\hat{\sigma}^2 = n^{-1} \Sigma(y_j - \mu)^2$$`
+`$$= n^{-1} \{\Sigma(y_j - \bar{y})^2 + n(\bar{y} - \mu)^2\} = \frac{n-1}{n}s^2 \{1 + \frac{t(\mu)^2}{n - 1} \}$$`
+* Where `\(t(\mu) = (\bar{y} - \mu)/(s^2/n)^{1/2}\)` is the observed value of the t-statistic
+
+
+
+
+---
+# Example - Normal distribution
+
+* The profile likelihood for `\(\mu\)` is 
+`$$\mathcal{l_p} = \mathcal{l}(\mu, \hat{\sigma_\mu}^2) \equiv -\frac{n}{2}\log [s^2\{ 1 + t(\mu)^2/(n - 1)\}]$$`
+
+* The overall MLE for `\(\mu\)` is `\(\hat{\mu} = \bar{y}, t(\hat{\mu}) = 0\)`, 
+
+`$$W_p(\mu) = n \log \{1 + \frac{T(\mu)^2}{n - 1}\}$$`
+* Where `\(T(\mu) = (\bar{Y} - \mu)/(S^2/n)^{1/2}\)`
+
+* `\(W_p(\mu)\)` is large when `\(T(\mu)\)` is large. When is the `\(T(\mu)\)` large?
+
+
+
+
+
+---
+# Example - Normal distribution
+
+* The profile likelihood for `\(\mu\)` is 
+`$$\mathcal{l_p} = \mathcal{l}(\mu, \hat{\sigma_\mu}^2) \equiv -\frac{n}{2}\log [s^2\{ 1 + t(\mu)^2/(n - 1)\}]$$`
+
+* The overall MLE for `\(\mu\)` is `\(\hat{\mu} = \bar{y}, t(\hat{\mu}) = 0\)`, 
+
+`$$W_p(\mu) = n \log \{1 + \frac{T(\mu)^2}{n - 1}\}$$`
+* Where `\(T(\mu) = (\bar{Y} - \mu)/(S^2/n)^{1/2}\)`
+
+* `\(W_p(\mu)\)` is large when `\(T(\mu)\)` is large. When is the `\(T(\mu)\)` large?
+
+* When the discrepancy between `\(\mu\)` and `\(\bar{Y}\)` is high in either direction
+
+
+
+---
+# Example - Normal distribution
+
+* If you simplify the equations for the CI based on `\(W_p(\mu)\)`, you will get `\(T(\mu)^2 \leq c\)`
+
+* The CI can be written as `\(\bar{Y} \pm n^\frac{-1}{2} S c^{-\frac{1}{2}}\)`
+
+* The usual CI for `\(\mu\)` based on the exact distribution of `\(T(\mu)\)` sets `\(c^\frac{1}{2}\)` to be a quantile of the standard t-distribution, `\(t_{n - 1}(1 - 2\alpha)\)`
+
+* For `\(n = 15, \alpha = 0.025\)`, `\(t_{n - 1}(1 - \alpha) = 2.14\)`, while the value of `\(c^{\frac{1}{2}}\)` is `\(2.05\)`
+
+* They will be even closer as `\(n\)` gets large
+
+
+
+
+
+---
+# Example - Normal distribution
+
+* The taylor series expansion of `\(W_p(\mu) \doteq n T(\mu)^2/(n - 1)\)` 
+
+* `\(T(\mu)^2\)` has `\(F_{1, n-1}\)` distribution
+
+* `\(F_{1, \nu}\)` distribution approaches `\(\chi_1^2\)` when `\(\nu \rightarrow \infty\)`
+
+
+
+
+---
+# Example - Weibull distribution
+
+* The difference between the Weibull and exponential MLE is roughly `\(12.5\)`
+
+* `\(W_p(\alpha^0) = 2\{\mathcal{l}(\hat{\theta}, \hat{\alpha}) - \mathcal{l}(\hat{\theta}_{\alpha^0} , \alpha^0)\} \doteq 25\)`
+
+* `\(W_p(\alpha^0)\)` should be approximately `\(\chi^2_1\)`
+
+* `\(c_1(0.95) = 3.84, c_1(0.99) = 6.635\)`
+
+*  The Weibull model fits the data appreciably better than the exponential one
+
+* A `\(95\%\)` CI for the true value of `\(\alpha\)` based on the profile log-likelihood is the set of `\(\alpha\)` which `\(\mathcal{l_p}(\alpha) \geq \mathcal{l_p}(\hat{\alpha}) - \frac{1}{2} \times 3.84\)`
+
+* It would be `\((3.5, 9.2)\)` for our example
+
+* Does not contain `\(\alpha = 1\)`
+
+
+
+
+
+
+---
+# Model fitting
+
+* we have supposed that the model is known apart from parameter values, but this is rarely the case in practice and it is essential to check model fit
+
+* Nesting model in a larger one, and use likelihood ratio statistic
+
+* If the restricted model is adequate, then the MLE  `\(\mathcal{l}(\psi^0, \hat{\mu}_{\psi^0})\)` will not increase sharply in the `\(\psi\)` direction
+
+`$$\frac{\partial \mathcal{l}(\psi^0, \hat{\mu}_{\psi^0})}{\partial \psi} \sim \mathcal{N}_p (0, I_{\psi\psi} - I_{\psi \lambda} I^{-1}_{\lambda \lambda} I_{\lambda \psi})$$`
+
+* Score test:
+
+`$$S = \frac{\partial \mathcal{l}(\psi^0, \hat{\mu}_{\psi^0})}{\partial \psi^T}(I_{\psi\psi} - I_{\psi \lambda} I^{-1}_{\lambda \lambda} I_{\lambda \psi})^{-1} \frac{\partial \mathcal{l}(\psi^0, \hat{\mu}_{\psi^0})}{\partial \psi} \sim \chi_p^2$$`
+
+
+* Is asymptotically equivalent to the likelihood ratio statistic `\(W_p(\psi^0)\)`, but is more convenient because it involves maximization only under the simpler model
+
+* `\(I\)` can be replaced with `\(J\)`
+
+
+
+
+---
+# Example - Spring failure
+
+* `\(\psi = \alpha\)`, `\(\psi^0 = 1\)`, and `\(\lambda = \theta\)`
+
+* When `\(\alpha = 1\)`,  `\(\hat{\theta} = \bar{y} = 168.3\)`
+
+* At `\((\hat{\theta}, 1)\)`, we have `\(\partial \mathcal{l}(\theta, \alpha)/\partial \alpha = 9.64\)` and `\((J_{\alpha \alpha} − J_{\alpha \theta} J_{\theta \theta} J_{\alpha \theta})^−1 = 0.097\)`
+
+* `\(S = 8.99\)`
+
+
+* In comparison to `\(\chi_1^2\)`, gives strong evidence that `\(\alpha \neq 1\)`
+
+
+
+
+---
+# Remarks
+
+* We're not always in the regular setting for the parameter space
+
+* The likelihood is not always a smooth function
+
+* Non-regular models
+
+
+
+---
+# Thank You for Attention
+References: 
+* Chapter 4, part 5. Davidson, Anthony Christopher. Statistical models. Vol. 11. Cambridge university press, 2003.
+
+&lt;div style="text-align: center"&gt;
+  &lt;img width="400" height="400" src="src/img/Data.gif" style="background:none; border:none; box-shadow:none;"&gt;
+&lt;/div&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
