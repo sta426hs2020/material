@@ -1,0 +1,171 @@
+---
+title: "Exercise 10"
+author: "Hubert Rehrauer"
+date: "16 11 2020"
+output: html_document
+---
+
+## Preprocessing and Clustering of a PBMC single cell RNA-seq data
+
+The single cell dataset consists of peripheral blood mononuclear cells. These cells comprise different cell types. For each cell the ground truth is provided in terms of the assigned cell type that was derived using additional data. A cell has "unassigned" as cell type if it could not be reliably assigned to a cell type. 
+
+1. Modify the quality-based cell filtering to remove the low quality cells that could not be assigned. Try with  different thresholds 
+2. Try different clustering methods and parameters such that different cell types are in separate clusters.
+
+Below is an example workflow inspired by http://bioconductor.org/books/release/OSCA/
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+startTime = proc.time()
+
+```
+
+```{r load packages, warning=FALSE}
+library(stats)
+suppressPackageStartupMessages(library(scran))
+suppressPackageStartupMessages(library(scater))
+suppressPackageStartupMessages(library(BiocParallel))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(HDF5Array))
+suppressPackageStartupMessages(library(hdf5r))
+suppressPackageStartupMessages(library(pheatmap))
+BPPARAM = BiocParallel::MulticoreParam(workers=2)
+
+
+```
+
+
+## Load the data
+
+
+```{r load data}
+sce = readRDS("pbmc-sce.RDS")
+sce
+```
+
+Optionally subsample 2000 cells to reduce runtime
+```{r subsample cells}
+set.seed(38)
+sce = sce[ , sample(1:ncol(sce), size = 2000, replace = FALSE)]
+
+```
+
+The cell type abundandances are
+```{r barplot cell types, fig.width=10, fig.height=5}
+cd = as.data.frame(colData(sce))
+ggplot(cd, aes(x=cellType)) + geom_bar() +
+   scale_fill_manual() + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+
+```
+
+
+
+
+Compute quality scores
+```{r quality scores}
+
+isMito <- grepl("^mt-", rowData(sce)$Symbol, ignore.case=TRUE)
+
+sce <- addPerCellQC(sce, subsets=list(Mito=isMito), percent_top=100,
+                    detection_limit=0, BPPARAM=BPPARAM)
+
+```
+
+Filter by quality
+```{r filter low quality cells}
+qc.lib <- isOutlier(sce$sum, log=TRUE, type="lower")
+qc.nexprs <- isOutlier(sce$detected, log=TRUE, type="lower")
+qc.mito <- isOutlier(sce$subsets_Mito_percent, type="higher")
+qc.top <- isOutlier(sce$percent_top_100, type="higher")
+
+discard <- qc.lib | qc.nexprs | qc.mito | qc.top
+
+DataFrame(LibSize=sum(qc.lib), NExprs=sum(qc.nexprs),
+          MitoProp=sum(qc.mito),
+          TopProp=sum(qc.top), Total=sum(discard))
+
+sce$discard = discard
+
+sceFilt = sce[ , !sce$discard]
+minCellsExpressed = 5
+isExpressed <- Matrix::rowSums(counts(sceFilt) >= 1) >= minCellsExpressed
+sceFilt = sceFilt[isExpressed, ]
+
+
+```
+
+Normalize
+
+```{r normalize}
+sceFilt = logNormCounts(sceFilt)
+
+
+```
+
+Compute reduced dimension representation
+```{r dime red}
+set.seed(38)
+dec <- modelGeneVarByPoisson(sceFilt, BPPARAM=BPPARAM)
+topGenes <- getTopHVGs(dec, n = 2000)
+sceFilt <- runPCA(sceFilt, subset_row=topGenes, BPPARAM=BPPARAM) 
+sceFilt <- runUMAP(sceFilt, dimred="PCA", BPPARAM=BPPARAM)
+
+```
+
+```{r denoise, include=FALSE, eval=FALSE}
+#dec <- modelGeneVarByPoisson(sceFilt, BPPARAM=BPPARAM)
+#sceFilt <- denoisePCA(sceFilt, technical=dec)
+set.seed(38)
+#sceFilt <- runTSNE(sceFilt, dimred="PCA")
+sceFilt <- runUMAP(sceFilt, dimred="PCA", BPPARAM=BPPARAM)
+
+
+```
+
+Cluster
+```{r kmeans}
+set.seed(100)
+clust.kmeans <- kmeans(reducedDim(sceFilt, "PCA"), centers=10)
+table(clust.kmeans$cluster)
+
+```
+
+
+```{r plot umap, fig.width=10}
+colLabels(sceFilt) <- factor(clust.kmeans$cluster)
+plotReducedDim(sceFilt, "UMAP", colour_by="label")
+plotReducedDim(sceFilt, "UMAP", colour_by="cellType")
+```
+
+Agreement of clusters with cell types
+```{r cluster agreement}
+tab <- table(sceFilt$label, sceFilt$cellType)
+phm <- pheatmap(log10(tab+10), main="cluster vs cell type",
+    color=viridis::viridis(100), silent=FALSE)
+phm
+
+
+
+```
+
+## Result
+
+Sensitivity and specificity of low quality cell detection
+```{r sensitivity}
+mean(sce$discard[sce$cellType == "unassigned"])
+mean(!sce$discard[sce$cellType != "unassigned"])
+
+```
+
+Agreement of clustering and cell type
+
+```{r adjusted rand index}
+mclust::adjustedRandIndex(sceFilt$label,sceFilt$cellType)
+```
+
+Runtime in seconds
+```{r elapsed}
+paste(signif((proc.time() - startTime)[ "elapsed"], digits=4), "s")
+```
