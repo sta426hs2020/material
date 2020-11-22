@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Validation of the model</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="STA426" />
+    <script src="libs/header-attrs-2.3/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="src/css/style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Validation of the model
+## Cross validation
+### STA426
+### 23.11.2020
+
+---
+
+# Validation
+
+* Generalization performance of the model measures the predictive power of a learning method on new, out-sample data. 
+
+* Leave-d-out cross-validation (for example LOOCV)
+
+* K-fold cross-validation: Larger bias than LOOCV. It is not which one whether it has less variance
+
+* Random divisions into test- and training-data
+
+
+
+
+---
+# Validation set approach
+
+
+&lt;img src="./Validation set approach.png" width="80%" height="60%" style="display: block; margin: auto;" /&gt;
+
+* Left: Validation error estimates for a single split into training and validation data sets.
+
+* Right: The validation method was repeated ten times, each time using a different random split of the observations into a training set and a validation set.
+
+* This illustrates the variability in the estimated test MSE that results from this approach.
+
+
+
+
+
+---
+# Cross validation
+
+* Model selection: Choosing tuning parameter or model that yields the smallest expected test MSE
+
+* Model assessment: (procedure assesment) estimate the expected test MSE that you will have
+
+
+
+---
+# Cross-validation of a procedure
+
+* Consider you want to use cross validation to validate your model selection and model assessment.
+
+* Your colleague suggests to select the best model with CV and assess it with CV
+
+* What's the problem of this approach? 
+
+
+
+
+---
+# Cross-validation of a procedure
+
+* Consider you want to use cross validation to validate your model selection and model assessment.
+
+* Your colleague suggests to select the best model with CV and assess it with CV
+
+* What's the problem of this approach? 
+
+* Too optimistic! 
+
+* What would you do if you were given a new dataset?
+
+
+
+---
+# Cross-validation of a procedure
+
+* Put your whole procedure in a CV
+
+* What if your model selection needs a CV on itself?
+
+* You need a double CV
+
+
+
+---
+# Double CV
+
+* Example for partial least squares estimation (PLS):
+
+&lt;img src="./Double-cross-validation-scheme-In-the-inner-loop-PLS-model-parameters-and-variables-are.png" width="80%" height="60%" style="display: block; margin: auto;" /&gt;
+
+
+
+
+
+---
+# Example - wrong approach
+
+
+* Naively, you want to predict a label, e.g. a disease, from 5000 features (genes)
+
+* We want to pick top 20 genes and predict the label
+
+* Pick the top genes with CV
+
+* Based on those 20 genes, we do a KNN with `\(k = 1\)`
+
+* Do a 10-fold CV to see how well do you perform on unseen data
+
+* But you've already saw the whole data when picking top genes!
+
+
+
+
+
+---
+# Example
+
+* Now let's see the real scenario in the code!
+
+* Overly optimistic scenario
+
+* Randomness in the training set and CV
+
+
+
+
+
+
+---
+--- 
+# Considerations
+
+* The features you pick might vary a bit
+
+* How does the model look like in the end?
+
+* Remember that this whole procedure is done to estimate how good your model will perform on a new data
+
+* In the end, you apply your procedure to the whole data
+
+
+
+
+
+---
+# Further considerations for CV
+
+* Always think about how would you proceed if you get a new data
+
+* Stratification: Take class imbalance into account
+
+* Shuffling the data: possible biases in the folds. Make sure that each data point creates an independent change on the model, without being biased by the same points before them.
+
+
+
+
+
+
+
+---
+# Thank You for Attention
+References: 
+* Chapter 5, part 1. James, G., Witten, D., Hastie, T. and Tibshirani, R., 2013. An introduction to statistical learning (Vol. 112, p. 18). New York: Springer.
+
+* Simulation taken from session 4, Computational Statisitcs Course, Spring 2020, Prof. Marloes Maathuis
+
+* Double CV taken from [this publication](https://www.researchgate.net/figure/Double-cross-validation-scheme-In-the-inner-loop-PLS-model-parameters-and-variables-are_fig2_46303817) by Lina Hultin Rosenberg
+
+&lt;div style="text-align: center"&gt;
+  &lt;img width="400" height="400" src="src/img/Data.gif" style="background:none; border:none; box-shadow:none;"&gt;
+&lt;/div&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

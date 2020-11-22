@@ -1,0 +1,9 @@
+.remark-inline-code{
+  background: transparent; /* lighter */
+  border-radius: 3px;
+  padding: 4px;
+}
+
+.hljs-github .hljs {
+    background: deepskyblue;
+}
