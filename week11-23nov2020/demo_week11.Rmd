@@ -1,0 +1,240 @@
+---
+title: "CyTOF analysis workflow for differential discovery with CATALYST"
+author: "Helena Crowell, presented by Stephany Orjuela"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: yeti
+    highlight: tango
+    code_folding: show
+    keep_md: true
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+---
+
+**Full pipeline with more detailed explanation available [here](http://bioconductor.org/packages/release/bioc/vignettes/CATALYST/inst/doc/differential.html).**
+
+```{r warning = FALSE, message = FALSE}
+# load required packages
+library(CATALYST) #clustering, vizualization
+library(SingleCellExperiment) #data container
+library(diffcyt) #differential state 
+
+library(flowCore)
+```
+
+# Example data
+
+- `PBMC_fs`:  
+a `flowSet` holding PBMCs samples from 4 patients, each containing between 500 and 1000 cells. For each sample, the expression of 10 cell surface and 14 signaling markers was measured before (REF) and upon BCR/FcR-XL stimulation (BCRXL) with B cell receptor/Fc receptor crosslinking for 30', resulting in a total of 8 samples.  
+This data set represents a subset of data originating from @Bodenmiller2012.
+- `PBMC_panel`:  
+a data.frame containing each marker's column name in the FCS file (`fcs_colname` column), its targeted protein marker (`antigen` column), and the `marker_class` ("type" or "state"). 
+- `PBMC_md`:  
+a data.frame where rows correspond to samples, and columns specify each sample's `file_name`, `sample_id`, `condition`, and `patient_id`.
+
+```{r load-data}
+# load example data
+data(PBMC_fs, PBMC_panel, PBMC_md)
+PBMC_fs
+
+PBMC_panel
+table(PBMC_panel$marker_class)
+
+PBMC_md
+
+```
+
+# Data preparation
+
+Data used and returned throughout differential analysis are held in objects of the `r BiocStyle::Biocpkg("SingleCellExperiment")` class. To bring the data into the appropriate format, `prepData()` requires the following inputs:
+
+- `x`: a `flowSet` holding the raw measurement data, or a character string that specifies a path to a set of FCS files.
+- `panel`: a 2 column data.frame that contains for each marker of interest i) its column name in the raw input data, and ii) its targeted protein marker.
+- `md`: a data.frame with columns describing the experimental design.
+
+
+```{r prepData}
+(sce <- prepData(PBMC_fs, PBMC_panel, PBMC_md))
+```
+
+
+# Clustering
+
+## `cluster`: *FlowSOM* clustering & *ConsensusClusterPlus* metaclustering
+
+`r BiocStyle::Biocpkg("CATALYST")` provides a simple wrapper to perform high resolution `FlowSOM` clustering and lower resolution `ConsensusClusterPlus` metaclustering. By default, the data will be initially clustered into `xdim = 10` x `ydim = 10` = 100 groups. Secondly, the function will metacluster populations into 20 through `maxK` clusters. To make analyses reproducible, the random seed may be set via `seed`.
+
+```{r cluster}
+sce <- cluster(sce, features = "type",
+    xdim = 10, ydim = 10, maxK = 20,
+    seed = 1)
+
+colData(sce)
+rowData(sce)
+#metadata(sce)$cluster_codes
+```
+
+Let K = `xdim` x `ydim` be the number of `r BiocStyle::Biocpkg("FlowSOM")` clusters. `cluster` will add information to the following slots of the input `SingleCellExperiment`: 
+
+- `colData`:
+  - `cluster_id`: cluster ID as inferred by `r BiocStyle::Biocpkg("FlowSOM")`. One of 1, ..., 100.
+- `rowData`:
+  - `marker_class`: factor `"type"` or `"state"`. Specifyies whether a marker has been used for clustering or not, respectively.
+- `metadata`:
+  - `cluster_codes`: a table with dimensions K x (`maxK` + 1). Contains the cluster codes for all metaclusterings.
+  - `delta_area`: a `ggplot` object (see below for details).
+
+
+## Delta area plot
+
+The delta area represents the amount of extra cluster stability gained when clustering into k groups as compared to k-1 groups. It can be expected that high stability of clusters can be reached when clustering into the number of groups that best fits the data. The "natural" number of clusters present in the data should thus corresponds to the value of k where there is no longer a considerable increase in stability (pleateau onset). For more details, the user can refer to the original description of the consensus clustering method [@Monti2003-ConsensusClusterPlus].
+
+```{r delta-area, fig.width = 5, fig.height = 3}
+# access & render delta area plot
+# (equivalent to metadata(sce)$delta_area)
+delta_area(sce)
+```
+
+
+# Visualization
+
+## `plotCounts`: Number of cells measured per sample
+
+The number of cells measured per sample may be plotted with `plotCounts`. This plot should be used as a guide together with other readouts to identify samples where not enough cells were assayed. Here, the grouping of samples (x-axis) is controlled by `group_by`; bars can be colored by a an additional cell metadata variable (argument `color_by`):
+
+```{r plotCounts-1, fig.width = 5, fig.height = 3}
+plotCounts(sce, 
+    group_by = "sample_id", 
+    color_by = "condition")
+```
+
+
+## `pbMDS`: Pseudobulk-level MDS plot
+
+A multi-dimensional scaling (MDS) plot on aggregated measurement values may be rendered with `pbMDS`. Such a plot will give a sense of similarities between cluster and/or samples in an unsupervised way and of key difference in expression before conducting any formal testing.
+
+[^1]: By default, median expression values are computed.
+
+Arguments `color_by`, `label_by`, `shape_by` can be used to color, label, shape pseudobulk instances by cell metadata variables of interest. Moreover, `size_by = TRUE` will scale point sizes proportional to the number of cells that went into aggregation. Finally, a custom color palette may be supplied to argument `pal.`
+
+### MDS on sample-level pseudobulks
+
+A multi-dimensional scaling (MDS) plot on median marker expression by sample has the potential to reveal global proteomic differences across conditions or other experimental metadata. Here, we color points by condition (to reveal treatment effects) and further shape them by patient (to highlight patient effects). In our example, we can see a clear horizontal (MDS dim. 1) separation between reference (REF) and stimulation condition (BCRXL), while patients are, to a lesser extent, separated vertically (MDS dim. 2):
+
+```{r pbMDS-1, fig.width = 5}
+pbMDS(sce, shape_by = "patient_id")
+```
+
+
+## `plotExprHeatmap`: Heatmap of aggregated marker expressions {#plotExprHeatmap}
+
+
+```{r plotExprHeatmap-sample, fig.width = 6.5, fig.height = 3.5}
+plotExprHeatmap(sce)
+```
+
+When `by != "sample_id"`, the clustering to use for aggregation is specified via `k`:
+
+```{r plotExprHeatmap-cluster, fig.width = 6, fig.height = 6}
+plotExprHeatmap(sce, features = "type",
+    by = "cluster_id", k = "meta6")
+```
+
+
+# Dimensionality reduction
+
+The number of cells in cytometry data is typically large, and for visualization of cells in a two-dimensional space it is often sufficient to run dimension reductions on a subset of the data. Thus, `CATALYST` provides the wrapper function `runDR` to apply any of the dimension reductions available from `BiocStyle::Biocpkg("scater")`.
+
+To make results reproducible, the random seed should be set via `set.seed` *prior* to computing reduced dimensions:
+
+```{r runDR}
+set.seed(1601)
+sce <- runDR(sce, dr = "UMAP", cells = 500, features = "type")
+```
+
+DRs available within the SCE can be viewed via `reducedDimNames` and accessed with `reducedDim(s)`:
+
+```{r}
+# view & access DRs
+reducedDimNames(sce)
+head(reducedDim(sce, "UMAP"))
+```
+
+While `r BiocStyle::Biocpkg("scater")`'s `plotReducedDim` function can be used to visualize DRs, `CATALYST` provides the `plotDR` wrapper, specifically to allow for coloring cells by the various clusterings available, and to support facetting by metadata factors (e.g., experimental condition, sample IDs):
+
+```{r plotDR-1, fig.height = 5}
+# color by marker expression & split by condition
+plotDR(sce, color_by = c("pS6", "pNFkB"), facet_by = "condition")
+```
+
+```{r plotDR-2, fig.height = 5}
+plotDR(sce, color_by = "meta20")
+```
+
+# Differental testing with `r BiocStyle::Biocpkg("diffcyt")`
+
+`r BiocStyle::Biocpkg("CATALYST")` has been designed to be compatible with the `r BiocStyle::Biocpkg("diffcyt")` package [@Weber2019-diffcyt], which implements statistical methods for differential discovery in high-dimensional cytometry (including flow cytometry, mass cytometry or CyTOF, and oligonucleotide-tagged cytometry) using high-resolution clustering and moderated tests.
+
+Please refer to the `r BiocStyle::Biocpkg("diffcyt")` [vignette](https://bioconductor.org/packages/3.7/bioc/vignettes/diffcyt/inst/doc/diffcyt_workflow.html) and R documentation (`??diffcyt`) for more detailed information.
+
+```{r diffcyt, message = FALSE, warning = FALSE, fig.show = "hide"}
+# create design & constrast matrix
+design <- createDesignMatrix(ei(sce), cols_design = "condition")
+contrast <- createContrast(c(0, 1))
+
+#contrast <- createContrast(c(0, 1, rep(0, 8))) If I include the patient_id column in the design
+
+# test for
+# - differential states (DS) within clusters
+# - differential abundance (DA) of clusters
+res_DS <- diffcyt(sce, clustering_to_use = "meta10",
+    analysis_type = "DS", method_DS = "diffcyt-DS-limma",
+    design = design, contrast = contrast)
+
+res_DA <- diffcyt(sce, clustering_to_use = "meta10",
+    analysis_type = "DA", method_DA = "diffcyt-DA-edgeR",
+    design = design, contrast = contrast)
+
+
+# extract result tables
+tbl_DA <- rowData(res_DA$res)
+tbl_DS <- rowData(res_DS$res)
+```
+
+## `plotDiffHeatmap`: Heatmap of differential testing results
+
+Differential testing results returned by `r BiocStyle::Biocpkg("diffcyt")` can be displayed with the `plotDiffHeatmap` function.
+
+For differential abundance (DA) tests, `plotDiffHeatmap` will display relative cluster abundances by samples; for differential state (DS) tests, `plotDiffHeatmap` will display aggregated marker expressions by sample.
+
+
+## Ex. 1: DA testing results
+
+We here set `all = TRUE` to display top-20 DA analysis results, without filtering on adjusted p-values and logFCs. Since differential testing was performed on 10 clusters only, this will simply include all available results.  
+By setting `fdr = 0.05` despite not filtering on significance, we can control the right-hand side annotation:
+
+```{r plotDiffHeatmap-da, fig.width = 6, fig.height = 5}
+plotDiffHeatmap(sce, tbl_DA, all = TRUE, fdr = 0.05)
+```
+
+## Ex. 2: DS testing results
+
+Via setting `fdr = 0.05`, we here display the top DS analysis results in terms of significance. Alternative to the example above, we sort these according their logFCs (`sort_by = "lfc"`), and include only a selected sample annotation (`col_anno = "condition"`): 
+
+```{r plotDiffHeatmap-ds, fig.width = 6, fig.height = 5}
+plotDiffHeatmap(sce, tbl_DS, fdr = 0.05, 
+    sort_by = "lfc", col_anno = "condition")
+```
+
+
+```{r}
+sessionInfo()
+```
+
