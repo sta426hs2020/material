@@ -1732,7 +1732,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">STA426 - Week 11</h1>
 <h4 class="author">Helena L. Crowell; adapted by Mark Robinson and Stephany Orjuela</h4>
-<h4 class="date">Nov 22, 2020</h4>
+<h4 class="date">Nov 30, 2020</h4>
 
 </div>
 
@@ -1745,7 +1745,8 @@ div.tocify {
 <p><strong>0. Load the <code>ExperimentHub</code> package.</strong><br />
 <strong>1. Initialize a Hub instance <code>eh</code> with the <code>ExperimentHub()</code> function.</strong><br />
 <strong>2. Use <code>query()</code> to retrieve any records that match the keyword <code>&quot;Bodenmiller&quot;</code>.</strong><br />
-<strong>3. Load the <code>&quot;Bodenmiller_BCR_XL_flowSet&quot;</code> into R using <code>eh[[&lt;id&gt;]]</code>.</strong> <strong>4. Briefly explore the <code>flowSet</code> object. How many markers are recorded? How many samples are there? How many cells per sample?</strong></p>
+<strong>3. Load the <code>&quot;Bodenmiller_BCR_XL_flowSet&quot;</code> into R using <code>eh[[&lt;id&gt;]]</code>.</strong><br />
+<strong>4. Briefly explore the <code>flowSet</code> object. How many markers are recorded? How many samples are there? How many cells per sample?</strong></p>
 </div>
 <div id="q2.-constructing-a-singlecellexperiment" class="section level1">
 <h1>Q2. Constructing a <code>SingleCellExperiment</code></h1>
@@ -1778,7 +1779,7 @@ div.tocify {
 <p><code>CATALYST</code> provides a simple wrapper to: i) perform high resolution <em><a href="https://bioconductor.org/packages/3.12/FlowSOM">FlowSOM</a></em> clustering; and, ii) apply <em><a href="https://bioconductor.org/packages/3.12/ConsensusClusterPlus">ConsensusClusterPlus</a></em> metaclustering to achieve reasonable aggregation of clusters to a lower resolution. Here, the data will be initially clustered into <code>xdim</code> x <code>ydim</code> groups. Secondly, the function will metacluster populations into 2 through <code>maxK</code> clusters.</p>
 <p>Clusterings are stored in <code>metadata(.)$cluster_codes</code>, and cluster IDs for a given clustering <code>&quot;x&quot;</code> can be accessed via <code>cluster_ids(., &quot;x&quot;)</code>.</p>
 <p><strong>1. Cluster the data into 8x8 high-resolution-, and 2-10 metaclusters.</strong><br />
-<strong>2. Print a table of the <em>percentage</em> of cells assigned to each of the 8 metaclusters.</strong><br />
+<strong>2. Print a table of the <em>percentage</em> of cells assigned to each of the 8 metaclusters for each sample (or for each condition).</strong><br />
 <strong>3. Using the percentages, give an example of clusters that are equally, more or less frequent<br>in one condition than the other.</strong></p>
 </div>
 <div id="q5.-dimension-reduction" class="section level1">
