@@ -1,0 +1,15 @@
+---
+title: "second-analysis"
+author: "ahmadrezauf"
+date: "2020-11-30"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+# Introduction
+
+Here is workflowr in a nutshell:
+
+![workflowr](../docs/assets/wrkflwr.png)
+

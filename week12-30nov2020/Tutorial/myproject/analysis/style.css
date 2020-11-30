@@ -1,0 +1,33 @@
+.remark-inline-code{
+  background: transparent; /* lighter */
+  border-radius: 3px;
+  padding: 4px;
+}
+
+.hljs-github .hljs {
+    background: deepskyblue;
+}
+
+/* Center workflowr buttons */
+.btn-workflowr {
+  display: block;
+  margin: auto;
+}
+
+
+/* Add red border around workflowr report button */
+.btn-workflowr-report {
+  border: red 5px solid;
+}
+
+
+/* Add blue border around workflowr past figure version buttons */
+.btn-workflowr-fig {
+  border: blue 5px solid;
+}
+
+
+/* Add purple border around workflowr session information button */
+.btn-workflowr-sessioninfo {
+  border: purple 5px solid;
+}

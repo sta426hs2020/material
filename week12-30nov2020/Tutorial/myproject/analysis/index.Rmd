@@ -1,0 +1,15 @@
+---
+title: "Home"
+site: workflowr::wflow_site
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+Welcome to my research website.
+Click on this [link](first-analysis.html) to see the histogram of iris data.
+
+
+And let's see what does workflowr bring us [workflowr in a nutshell](second-analysis.html)

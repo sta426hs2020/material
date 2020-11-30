@@ -1,0 +1,43 @@
+name: myproject
+output_dir: ../docs
+navbar:
+  title: myproject
+  left:
+  - text: Home
+    icon: fa-home
+    href: index.html
+  - text: About
+    icon: fa-info
+    href: about.html
+  - text: Project
+    icon: fa-project-diagram
+    href: project.html
+  - text: More
+    icon: fa-gear
+    menu:
+    - text: Heading 1
+    - text: Page A
+      href: page-a.html
+    - text: Page B
+      href: page-b.html
+    - text: '---------'
+    - text: Heading 2
+    - text: Page C
+      href: page-c.html
+    - text: Page D
+    - text: Page C
+      icon: fa-sticky-note
+      href: page-c.html
+  right:
+  - icon: fa-github
+    text: Source code
+    href: https://github.com/ahmadrezauf/myproject
+output:
+  workflowr::wflow_html:
+    toc: true
+    toc_float: true
+    theme: cosmo
+    highlight: textmate
+    css: style.css
+    include:
+      after_body: footer.html

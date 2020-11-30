@@ -1,0 +1,29 @@
+---
+title: "first-analysis"
+author: "ahmadrezauf"
+date: "2020-11-29"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Introduction
+
+Here is the summary of iris:
+```{r}
+summary(iris)
+```
+
+Let's see some histograms:
+
+```{r}
+hist(iris$Sepal.Length, breaks = 20, xlim = c(4, 8), col = "pink", xlab = "Sepal Length (cm)", 
+     main = "IRIS")
+```
+
+
+```{r}
+hist(iris$Sepal.Length, breaks = 20, probability = T, xlim = c(4, 8), ylim = c(0.0, 1.0), col = "pink", xlab = "Sepal Length (cm)", main = "IRIS")
+lines(density(iris$Sepal.Length), col = "blue", lwd = 2)
+```
+
