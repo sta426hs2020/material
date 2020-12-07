@@ -7,7 +7,7 @@ Mondays 9.00-9.45 (remote), 10.00-10.45 (remote)
 ## Exercises
 Monday 11.00-11.45 (remote)
 
-## Lecturersa
+## Lecturers
 
 [Dr. Hubert Rehrauer](http://www.fgcz.ch/the-center/people/rehrauer.html), Group Leader of Genome Informatics at [FGCZ](http://www.fgcz.ch/)  
 
