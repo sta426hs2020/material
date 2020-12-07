@@ -1,0 +1,228 @@
+---
+title: "Full scRNAseq pipeline"
+author: "Pierre-Luc Germain"
+date: "12/2/2020"
+output: html_document
+---
+
+# Loading necessary libraries
+
+```{r}
+suppressPackageStartupMessages({
+  library(SingleCellExperiment)
+  library(scran)
+  library(scater)
+  library(batchelor)
+  library(scDblFinder)
+  library(sctransform)
+  library(muscat)
+  library(SEtools)
+  library(cowplot)
+  library(BiocParallel)
+  library(ComplexHeatmap)
+})
+```
+
+# Preprocessing & Clustering
+
+## Loading the data
+
+```{r}
+## if you haven't downloaded it yet:
+# download.file("http://imlspenticton.uzh.ch/teaching/STA426/week13.SCE.rds", destination="week13.SCE.rds")
+
+sce <- readRDS("week13.SCE.rds")
+table(sce$sample_id, sce$group_id)
+```
+
+## QC
+
+```{r}
+# get mitochondrial genes:
+mito <- grep("mt-", rownames(sce), value = TRUE)
+# get QC metrics:
+sce <- addPerCellQC(sce, subsets=list(Mt=mito), percent.top=c(5,10))
+sce <- addPerFeatureQC(sce)
+
+# we plot some of the metrics
+qc <- as.data.frame(colData(sce))
+ggplot(qc, aes(subsets_Mt_percent)) + geom_histogram() + facet_wrap(~sample_id)
+ggplot(qc, aes(log10(sum))) + geom_histogram() + facet_wrap(~sample_id)
+ggplot(qc, aes(log10(sum), log10(detected))) + geom_point() + geom_density2d()
+
+# we set thresholds on the library sizes and detection rate:
+sce$qc.out <- isOutlier(log(sce$sum),nmads=3,batch=sce$sample_id) |
+              isOutlier(log(sce$detected),nmads=3,batch=sce$sample_id)
+# a fancier job would be accomplished by https://github.com/wmacnair/SampleQC
+
+# we flag doublets:
+sce <- scDblFinder(sce, samples="sample_id", BPPARAM=MulticoreParam(3))
+```
+
+## Normalization & reduction
+
+```{r}
+# get rid of seldom detected genes
+sce <- sce[rowData(sce)$detected>=4,]
+
+## (faster) standard log-normalization
+# sce <- logNormCounts(sce)
+
+# variance-stabilizing transformation
+vst <- suppressWarnings(sctransform::vst(counts(sce)))
+logcounts(sce) <- vst$y
+# get highly-variable genes
+hvg <- row.names(sce)[order(vst$gene_attr$residual_variance, decreasing=TRUE)[1:2000]]
+
+# run PCA
+sce <- runPCA(sce, subset_row=hvg)
+
+# check the variance explained by the PCs:
+pc.var <- attr(reducedDim(sce),"percentVar")
+plot(pc.var, xlab="PCs", ylab="% variance explained")
+# restrict to the first 20 components:
+reducedDim(sce) <- reducedDim(sce)[,1:20]
+
+# run and plot 2d projections based on the PCA:
+sce <- runTSNE(sce, dimred="PCA")
+sce <- runUMAP(sce, dimred="PCA")
+# plot by doublet score
+plot_grid(plotUMAP(sce, colour_by="scDblFinder.score"), 
+          plotTSNE(sce, colour_by="scDblFinder.score"))
+
+# filter out bad cells
+sce <- sce[,sce$scDblFinder.class!="doublet" & !sce$qc.out]
+
+# check mixing:
+plot_grid(plotTSNE(sce, colour_by="group_id"), plotTSNE(sce, colour_by="sample_id"))
+
+## a better readout (but longer to compute) for cell mixing would be given by the CellMixS package:
+# sce <- cms(sce, k=50, group = "sample_id", BPPARAM=MulticoreParam(3))
+# plotTSNE(sce, colour_by="cms_smooth")
+```
+
+## Batch correction
+
+```{r}
+# batch corrected using the mutual nearest neighbors
+sce2 <- fastMNN(sce, batch=sce$sample_id, BNPARAM=AnnoyParam())
+# we take the corrected PCA
+reducedDim(sce, type="PCA") <- reducedDim(sce2)[,1:20]
+# and recompute the 2d projections
+sce <- runTSNE(sce, dimred="PCA")
+sce <- runUMAP(sce, dimred="PCA", n_neighbors=25)
+```
+
+## Clustering
+
+```{r}
+g <- buildKNNGraph(sce, BNPARAM=AnnoyParam(), use.dimred="PCA", k=30)
+sce$cluster <- as.factor(cluster_louvain(g)$membership)
+
+saveRDS(sce, file="week13.SCE.processed.rds")
+
+plot_grid( plotTSNE(sce, colour_by="cluster", text_by="cluster"),
+           plotUMAP(sce, colour_by="cluster", text_by="cluster") )
+```
+
+## Cluster abundances across samples
+
+```{r}
+ca <- table(cluster=sce$cluster, sample=sce$sample_id)
+ggplot(as.data.frame(ca), aes(sample, cluster, fill=Freq)) + geom_tile() + geom_text(aes(label=Freq))
+```
+
+
+# Cluster annotation
+
+## De-novo marker identification
+
+```{r}
+# we identify genes that differ between clusters:
+mm <- findMarkers(sce, groups=sce$cluster, test.type="binom")
+# we select the top 5 markers by cluster:
+markers <- unique(unlist(lapply(mm, FUN=function(x){
+  head(row.names(x[x$FDR<0.01,]),5)
+})))
+```
+
+## Known markers
+
+```{r}
+genes <- list(
+  neuronal = c("Snap25", "Stmn2", "Syn1", "Rbfox3", "Dlg4"),
+  neuronal_excitatory = c("Slc17a7","Camk2a","Grin2b"),
+  neuronal_inhibitory = c("Gad1","Lhx6"),
+  astrocytes = c("Aqp4", "Gfap", "Fgfr3","Dio2"),
+  endothelial = c("Cldn5","Nostrin","Flt1"),
+  microglia = c("C1qb","Tyrobp","P2ry12", "Csf1r", "Irf8"),
+  oligodendrocyte = c("Opalin","Plp1","Mag","Mog"),
+  OPC = c("Pdgfra","Sox6","Bcan")
+)
+# since the row.names of the object have also the ensembl id, we find the matching row names for each gene:
+km <- lapply(genes, FUN=function(g) grep(paste0(g, "$", collapse="|"), rownames(sce2), value=TRUE))
+```
+
+## Pseudo-bulk aggregation
+
+```{r}
+# mean logcounts by cluster:
+pb <- aggregateData(sce, "logcounts", by=c("cluster"), fun="mean")
+# build a heatmap of the mean logcounts of the known markers:
+h1 <- pheatmap(assay(pb)[unlist(km),], annotation_row=data.frame(row.names=unlist(km), type=rep(names(km), lengths(km))), split=rep(names(km), lengths(km)), cluster_rows=FALSE, scale="row")
+h1
+# heatmap for the de-novo markers:
+h2 <- pheatmap(assay(pb)[markers,], scale="row")
+h2
+```
+
+```{r}
+# we will assign clusters to the cell type whose markers are the most expressed
+# we get rid of the unspecific neuronal markers:
+km <- km[-1]
+# we extract the pseudo-bulk counts of the markers for each cluster
+mat <- assay(pb)[unlist(km),]
+# we aggregate across markers of the same type
+mat <- aggregate(t(scale(t(mat))), by=list(type=rep(names(km), lengths(km))), FUN=sum)
+# for each column (cluster), we select the row (cell type) which has the maximum aggregated value
+cl2 <- mat[,1][apply(mat[,-1], 2, FUN=which.max)]
+# we convert the cells' cluster labels to cell type labels:
+sce$cluster2 <- cl2[sce$cluster]
+
+# we aggregate again to pseudo-bulk using the new clusters
+pb <- aggregateData(sce, "logcounts", by=c("cluster2"), fun="mean")
+# we plot again the expression of the markers as a sanity check
+h1 <- pheatmap(assay(pb)[unlist(km),], annotation_row=data.frame(row.names=unlist(km), type=rep(names(km), lengths(km))), split=rep(names(km), lengths(km)), cluster_rows=FALSE, scale="row")
+
+plotUMAP(sce, colour_by="cluster2", text_by="cluster2")
+```
+
+# Differential state analysis
+
+```{r}
+# we aggregate by cluster x sample to perform pseudo-bulk differential state analysis
+sce <- muscat::prepSCE(sce, kid="cluster2")
+pb <- aggregateData(sce)
+
+pbMDS(pb)
+
+# we run edgeR on each cluster and extract the results
+res <- pbDS(pb)
+res2 <- dplyr::bind_rows(res$table[[1]])
+
+# volcano plots
+ggplot(res2, aes(logFC, -log10(p_adj.loc), colour=p_adj.loc<0.05)) + geom_point() + facet_wrap(~cluster_id)
+# top genes in a given cell type
+pbHeatmap(sce2, res, k="astrocytes")
+
+# we extract all differentially-expressed genes:
+degs <- unique(res2[res2$p_adj.loc<0.05,"gene"])
+
+# we flatten the pb object (putting all cell types in the same assay) and calculate foldchanges
+pb2 <- flattenPB(pb, lfc_group="group_id")
+# we reorder
+pb2 <- pb2[,order(pb2$cluster_id, pb2$group_id)]
+# we plot a heatmap of the logFC of the top 200 genes across all cell types
+sechm(pb2, head(degs,200), assayName="log2FC", gaps_at="cluster_id")
+```
+
