@@ -1,0 +1,10 @@
+name: our_app
+title:
+username:
+account: ahmadreza
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3360829
+bundleId: 3984079
+url: https://ahmadreza.shinyapps.io/our_app/
+when: 1607891542.74395
